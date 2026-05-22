@@ -29,6 +29,43 @@ st.set_page_config(
 )
 
 # ============================================
+# BẢO MẬT - KIỂM TRA MẬT KHẨU NGAY TỪ ĐẦU
+# ============================================
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown("""
+    <style>
+    .block-container { max-width: 500px !important; margin: auto; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif !important; }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style='text-align: center; padding: 60px 20px 20px;'>
+        <div style='font-size: 4rem;'>🔐</div>
+        <h2 style='color: #e2e8f0; margin-top: 1rem;'>CỔNG PHÁP LUẬT HẢI QUAN</h2>
+        <p style='color: #94a3b8;'>Nhập mật khẩu để truy cập hệ thống</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        password = st.text_input("🔑 Mật khẩu", type="password", placeholder="Nhập mật khẩu...", key="login_pw")
+        login_btn = st.button("🚀 Đăng nhập", use_container_width=True, type="primary")
+        
+        if login_btn:
+            if password == "1991":
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("❌ Sai mật khẩu! Vui lòng thử lại.")
+    
+    st.stop()
+
+# ============================================
 # CUSTOM CSS
 # ============================================
 st.markdown("""
@@ -1085,81 +1122,7 @@ def main():
 
 
 # ============================================
-# LOGIN AUTHENTICATION
+# KHỞI CHẠY ỨNG DỤNG
 # ============================================
-def login_page():
-    """Render login page with password protection."""
-    st.markdown("""
-    <style>
-    .login-container {
-        max-width: 420px;
-        margin: 80px auto;
-        padding: 2.5rem;
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid #334155;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        text-align: center;
-    }
-    .login-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-    }
-    .login-title {
-        color: #e2e8f0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    .login-subtitle {
-        color: #94a3b8;
-        font-size: 0.85rem;
-        margin-bottom: 2rem;
-    }
-    .login-error {
-        background: rgba(239,68,68,0.15);
-        color: #f87171;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        margin-top: 1rem;
-        border: 1px solid rgba(239,68,68,0.3);
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="login-container">
-        <div class="login-icon">🔐</div>
-        <div class="login-title">CỔNG PHÁP LUẬT HẢI QUAN</div>
-        <div class="login-subtitle">Nhập mật khẩu để truy cập hệ thống</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        password = st.text_input(
-            "🔑 Mật khẩu",
-            type="password",
-            placeholder="Nhập mật khẩu...",
-            key="login_password",
-        )
-        login_btn = st.button("🚀 Đăng nhập", use_container_width=True, type="primary")
-
-        if login_btn:
-            if password == "1991":
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.markdown('<div class="login-error">❌ Sai mật khẩu! Vui lòng thử lại.</div>', unsafe_allow_html=True)
-
-
-
-if 'authenticated' not in st.session_state:
-    st.session_state.authenticated = False
-
-if st.session_state.authenticated:
-    main()
-else:
-    login_page()
-
+# Nếu code chạy đến đây = đã qua bước xác thực ở trên (st.stop() không chặn)
+main()
