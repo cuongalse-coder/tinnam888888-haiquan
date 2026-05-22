@@ -1154,11 +1154,12 @@ def login_page():
                 st.markdown('<div class="login-error">❌ Sai mật khẩu! Vui lòng thử lại.</div>', unsafe_allow_html=True)
 
 
-if __name__ == "__main__":
-    if 'authenticated' not in st.session_state:
-        st.session_state.authenticated = False
 
-    if st.session_state.authenticated:
-        main()
-    else:
-        login_page()
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+if st.session_state.authenticated:
+    main()
+else:
+    login_page()
+
