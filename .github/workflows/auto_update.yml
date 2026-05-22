@@ -1,0 +1,35 @@
+name: Tự động cập nhật văn bản pháp luật
+
+on:
+  schedule:
+    # Chạy 4 lần 1 ngày: 00:00, 06:00, 12:00, 18:00 (UTC)
+    # Tương đương: 07:00, 13:00, 19:00, 01:00 giờ Việt Nam (GMT+7)
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch: # Cho phép bấm chạy bằng tay trên giao diện GitHub
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Thiết lập Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Cài đặt thư viện
+        run: |
+          pip install -r requirements.txt
+
+      - name: Chạy Bot thu thập văn bản mới
+        run: python update_documents.py
+
+      - name: Commit và Push thay đổi (nếu có)
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/legal-documents.json
+          # Chỉ commit nếu file có sự thay đổi
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Cập nhật văn bản pháp luật mới nhất" && git push)

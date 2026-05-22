@@ -1,5 +1,380 @@
 [
   {
+    "id": "20-2025-tt-btc",
+    "type": "thong-tu",
+    "typeName": "Thông tư",
+    "number": "20/2025/TT-BTC",
+    "title": "Thông tư 20/2025/TT-BTC",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Bộ Tài chính",
+    "summary": "Nội dung cập nhật mới từ file 20/2025/TT-BTC",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Thông tư 20/2025/TT-BTC. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "A",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "67-2025-qh15",
+    "type": "nghi-quyet",
+    "typeName": "Nghị quyết",
+    "number": "67/2025/QH15",
+    "title": "Nghị quyết 67/2025/QH15",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 67/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị quyết 67/2025/QH15. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "C",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "320-2025-nđ-cp",
+    "type": "nghi-dinh",
+    "typeName": "Nghị định",
+    "number": "320/2025/NĐ-CP",
+    "title": "Nghị định 320/2025/NĐ-CP",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Chính phủ",
+    "summary": "Nội dung cập nhật mới từ file 320/2025/NĐ-CP",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị định 320/2025/NĐ-CP. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "B",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "111-2025-tt-btc",
+    "type": "thong-tu",
+    "typeName": "Thông tư",
+    "number": "111/2025/TT-BTC",
+    "title": "Thông tư 111/2025/TT-BTC",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Bộ Tài chính",
+    "summary": "Nội dung cập nhật mới từ file 111/2025/TT-BTC",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Thông tư 111/2025/TT-BTC. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "A",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "109-2025-qh15",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "109/2025/QH15",
+    "title": "Luật số 109/2025/QH15",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 109/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật số 109/2025/QH15. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "90-2025-qh15",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "90/2025/QH15",
+    "title": "Luật số 90/2025/QH15",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 90/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật số 90/2025/QH15. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "56-2024-qh15",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "56/2024/QH15",
+    "title": "Luật số 56/2024/QH15",
+    "issueDate": "2024-01-01",
+    "effectiveDate": "2024-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 56/2024/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2024",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật số 56/2024/QH15. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "99-2025-tt-btc",
+    "type": "thong-tu",
+    "typeName": "Thông tư",
+    "number": "99/2025/TT-BTC",
+    "title": "Thông tư 99/2025/TT-BTC hướng dẫn chính sách thuế",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Bộ Tài chính",
+    "summary": "Nội dung cập nhật mới từ file 99/2025/TT-BTC",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Thông tư 99/2025/TT-BTC hướng dẫn chính sách thuế. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "A",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "204-2025-qh15",
+    "type": "nghi-quyet",
+    "typeName": "Nghị quyết",
+    "number": "204/2025/QH15",
+    "title": "Nghị quyết 204/2025/QH15 về giảm thuế GTGT",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 204/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị quyết 204/2025/QH15 về giảm thuế GTGT. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "C",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "181-2025-nđ-cp",
+    "type": "nghi-dinh",
+    "typeName": "Nghị định",
+    "number": "181/2025/NĐ-CP",
+    "title": "Nghị định 181/2025/NĐ-CP về chính sách thuế",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Chính phủ",
+    "summary": "Nội dung cập nhật mới từ file 181/2025/NĐ-CP",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị định 181/2025/NĐ-CP về chính sách thuế. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "B",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "149-2025-qh15",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "149/2025/QH15",
+    "title": "Luật sửa đổi, bổ sung Luật Thuế GTGT",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 149/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật sửa đổi, bổ sung Luật Thuế GTGT. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "126-2020-nđ-cp",
+    "type": "nghi-dinh",
+    "typeName": "Nghị định",
+    "number": "126/2020/NĐ-CP",
+    "title": "Nghị định quy định chi tiết một số điều của Luật Quản lý thuế",
+    "issueDate": "2020-01-01",
+    "effectiveDate": "2020-02-01",
+    "issuingBody": "Chính phủ",
+    "summary": "Nội dung cập nhật mới từ file 126/2020/NĐ-CP",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2020",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị định quy định chi tiết một số điều của Luật Quản lý thuế. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "B",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "123-2020-nđ-cp",
+    "type": "nghi-dinh",
+    "typeName": "Nghị định",
+    "number": "123/2020/NĐ-CP",
+    "title": "Nghị định quy định về hóa đơn, chứng từ",
+    "issueDate": "2020-01-01",
+    "effectiveDate": "2020-02-01",
+    "issuingBody": "Chính phủ",
+    "summary": "Nội dung cập nhật mới từ file 123/2020/NĐ-CP",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2020",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Nghị định quy định về hóa đơn, chứng từ. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "B",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "38-2019-qh14",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "38/2019/QH14",
+    "title": "Luật Quản lý thuế năm 2019",
+    "issueDate": "2019-01-01",
+    "effectiveDate": "2019-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 38/2019/QH14",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2019",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật Quản lý thuế năm 2019. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
+    "id": "108-2025-qh15",
+    "type": "luat",
+    "typeName": "Luật",
+    "number": "108/2025/QH15",
+    "title": "Luật Quản lý thuế (sửa đổi) năm 2025",
+    "issueDate": "2025-01-01",
+    "effectiveDate": "2025-02-01",
+    "issuingBody": "Quốc hội",
+    "summary": "Nội dung cập nhật mới từ file 108/2025/QH15",
+    "purpose": "Hướng dẫn thi hành chính sách thuế và pháp luật liên quan năm 2025",
+    "keyPoints": [
+      "Tài liệu mới cập nhật năm 2026 từ hệ thống",
+      "Áp dụng cho kỳ tính thuế mới"
+    ],
+    "articles": [],
+    "content": "Văn bản gốc: Luật Quản lý thuế (sửa đổi) năm 2025. (Nội dung chi tiết vui lòng xem file đính kèm hoặc tra cứu trên hệ thống).",
+    "status": "active",
+    "folder": "D",
+    "tags": [
+      "thuế",
+      "cập nhật 2026"
+    ],
+    "relatedDocs": []
+  },
+  {
     "id": "luat-hai-quan-2014",
     "type": "luat",
     "typeName": "Luật",
@@ -43,8 +418,21 @@
     "content": "LUẬT HẢI QUAN\n\nCăn cứ Hiến pháp nước Cộng hòa xã hội chủ nghĩa Việt Nam;\nQuốc hội ban hành Luật Hải quan.\n\nChương I: NHỮNG QUY ĐỊNH CHUNG\n\nĐiều 1. Phạm vi điều chỉnh\nLuật này quy định về quản lý nhà nước về hải quan đối với hàng hóa được xuất khẩu, nhập khẩu, quá cảnh, phương tiện vận tải xuất cảnh, nhập cảnh, quá cảnh của tổ chức, cá nhân trong nước và nước ngoài trong lãnh thổ hải quan; về tổ chức và hoạt động của Hải quan.\n\nĐiều 2. Đối tượng áp dụng\n1. Tổ chức, cá nhân thực hiện xuất khẩu, nhập khẩu, quá cảnh hàng hóa, xuất cảnh, nhập cảnh, quá cảnh phương tiện vận tải.\n2. Tổ chức, cá nhân có quyền và nghĩa vụ liên quan đến hoạt động xuất khẩu, nhập khẩu, quá cảnh hàng hóa, xuất cảnh, nhập cảnh, quá cảnh phương tiện vận tải.\n3. Cán bộ, công chức hải quan.\n\nĐiều 3. Chính sách về hải quan\n1. Nhà nước tạo điều kiện thuận lợi về hải quan đối với hoạt động xuất khẩu, nhập khẩu, xuất cảnh, nhập cảnh, quá cảnh lãnh thổ Việt Nam.\n2. Áp dụng quản lý rủi ro trong kiểm tra, giám sát hải quan.\n3. Hiện đại hóa quản lý hải quan phù hợp với tiêu chuẩn quốc tế.",
     "status": "active",
     "folder": "D",
-    "tags": ["hải quan", "luật", "thủ tục hải quan", "xuất khẩu", "nhập khẩu", "quá cảnh", "kho ngoại quan", "kiểm tra", "giám sát"],
-    "relatedDocs": ["nd-08-2015", "tt-38-2015"]
+    "tags": [
+      "hải quan",
+      "luật",
+      "thủ tục hải quan",
+      "xuất khẩu",
+      "nhập khẩu",
+      "quá cảnh",
+      "kho ngoại quan",
+      "kiểm tra",
+      "giám sát"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "luat-thue-xnk-2016",
@@ -85,8 +473,20 @@
     "content": "LUẬT THUẾ XUẤT KHẨU, THUẾ NHẬP KHẨU\n\nĐiều 1. Phạm vi điều chỉnh: Luật này quy định về đối tượng chịu thuế, người nộp thuế, căn cứ tính thuế, thời điểm tính thuế, biểu thuế, thuế chống bán phá giá, thuế chống trợ cấp, thuế tự vệ áp dụng đối với hàng hóa xuất khẩu, nhập khẩu; miễn thuế, giảm thuế, hoàn thuế xuất khẩu, thuế nhập khẩu.\n\nĐiều 5. Căn cứ tính thuế:\n1. Số tiền thuế XNK được xác định căn cứ vào: trị giá tính thuế, thuế suất từng mặt hàng.\n2. Trị giá tính thuế nhập khẩu: là trị giá giao dịch (giá CIF).\n3. Trị giá tính thuế xuất khẩu: là giá bán tại cửa khẩu xuất (giá FOB).\n\nĐiều 9. Miễn thuế hàng gia công cho nước ngoài: Nguyên liệu, vật tư, linh kiện nhập khẩu để gia công cho thương nhân nước ngoài được miễn thuế nhập khẩu. Sản phẩm gia công xuất khẩu được miễn thuế xuất khẩu.\n\nĐiều 10. Miễn thuế hàng sản xuất xuất khẩu (SXXK): Nguyên liệu, vật tư nhập khẩu để sản xuất hàng hóa xuất khẩu được hoàn thuế nhập khẩu khi sản phẩm thực xuất khẩu.",
     "status": "active",
     "folder": "D",
-    "tags": ["thuế xuất khẩu", "thuế nhập khẩu", "miễn thuế", "hoàn thuế", "tạm nhập tái xuất", "gia công", "sản xuất xuất khẩu", "thuế suất"],
-    "relatedDocs": ["nd-134-2016", "tt-38-2015"]
+    "tags": [
+      "thuế xuất khẩu",
+      "thuế nhập khẩu",
+      "miễn thuế",
+      "hoàn thuế",
+      "tạm nhập tái xuất",
+      "gia công",
+      "sản xuất xuất khẩu",
+      "thuế suất"
+    ],
+    "relatedDocs": [
+      "nd-134-2016",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "luat-qlnt-2017",
@@ -121,8 +521,18 @@
     "content": "LUẬT QUẢN LÝ NGOẠI THƯƠNG\n\nĐiều 1. Phạm vi điều chỉnh: Luật này quy định về biện pháp quản lý ngoại thương, phát triển hoạt động ngoại thương.\n\nĐiều 4. Nguyên tắc quản lý ngoại thương:\n1. Nhà nước quản lý ngoại thương theo quy định của pháp luật và phù hợp điều ước quốc tế.\n2. Bảo đảm minh bạch, công khai.\n3. Bảo hộ quyền và lợi ích hợp pháp của Nhà nước, thương nhân.\n\nĐiều 5. Hàng hóa cấm xuất khẩu, cấm nhập khẩu:\nDanh mục do Chính phủ quy định bao gồm: vũ khí, đạn dược, ma túy, hóa chất độc, chất thải nguy hại, động vật hoang dã quý hiếm.",
     "status": "active",
     "folder": "D",
-    "tags": ["ngoại thương", "quản lý", "cấm xuất khẩu", "cấm nhập khẩu", "tạm nhập tái xuất", "chống bán phá giá", "phòng vệ thương mại"],
-    "relatedDocs": ["nd-69-2018"]
+    "tags": [
+      "ngoại thương",
+      "quản lý",
+      "cấm xuất khẩu",
+      "cấm nhập khẩu",
+      "tạm nhập tái xuất",
+      "chống bán phá giá",
+      "phòng vệ thương mại"
+    ],
+    "relatedDocs": [
+      "nd-69-2018"
+    ]
   },
   {
     "id": "luat-gtgt-2024",
@@ -161,8 +571,20 @@
     "content": "LUẬT THUẾ GIÁ TRỊ GIA TĂNG (SỬA ĐỔI)\n\nĐiều 1. Phạm vi điều chỉnh: Luật này quy định về đối tượng chịu thuế, đối tượng không chịu thuế, người nộp thuế, căn cứ và phương pháp tính thuế giá trị gia tăng; khấu trừ, hoàn thuế giá trị gia tăng.\n\nĐiều 2. Thuế giá trị gia tăng: Thuế GTGT là thuế tính trên giá trị tăng thêm của hàng hóa, dịch vụ phát sinh trong quá trình từ sản xuất, lưu thông đến tiêu dùng.\n\nĐiều 3. Đối tượng chịu thuế: Hàng hóa, dịch vụ sử dụng cho sản xuất, kinh doanh và tiêu dùng ở Việt Nam là đối tượng chịu thuế GTGT, trừ các đối tượng quy định tại Điều 5 của Luật này.\n\nĐiều 5. Đối tượng không chịu thuế:\nKhoản 20: Hàng hóa chuyển khẩu, quá cảnh qua lãnh thổ Việt Nam; hàng tạm nhập khẩu, tái xuất khẩu; hàng tạm xuất khẩu, tái nhập khẩu; nguyên liệu nhập khẩu để sản xuất, gia công hàng hóa xuất khẩu.\n\nĐIỂM MỚI QUAN TRỌNG: Kể từ 01/07/2025, sản phẩm gia công, sản xuất xuất khẩu tái nhập khẩu trở lại VN thuộc đối tượng chịu thuế GTGT.",
     "status": "active",
     "folder": "D",
-    "tags": ["thuế GTGT", "giá trị gia tăng", "VAT", "đối tượng chịu thuế", "miễn thuế", "tạm nhập tái xuất", "gia công", "xuất khẩu"],
-    "relatedDocs": ["cv-15110-2026", "tt-07-2022"]
+    "tags": [
+      "thuế GTGT",
+      "giá trị gia tăng",
+      "VAT",
+      "đối tượng chịu thuế",
+      "miễn thuế",
+      "tạm nhập tái xuất",
+      "gia công",
+      "xuất khẩu"
+    ],
+    "relatedDocs": [
+      "cv-15110-2026",
+      "tt-07-2022"
+    ]
   },
   {
     "id": "nd-08-2015",
@@ -203,8 +625,25 @@
     "content": "NGHỊ ĐỊNH 08/2015/NĐ-CP\nQuy định chi tiết và biện pháp thi hành Luật Hải quan về thủ tục hải quan, kiểm tra, giám sát, kiểm soát hải quan\n\nChương I: QUY ĐỊNH CHUNG\nĐiều 1. Phạm vi điều chỉnh: Nghị định này quy định chi tiết và biện pháp thi hành Luật Hải quan về thủ tục hải quan, kiểm tra, giám sát, kiểm soát hải quan đối với hàng hóa xuất khẩu, nhập khẩu, quá cảnh; phương tiện vận tải xuất cảnh, nhập cảnh, quá cảnh.\n\nChương V: THỦ TỤC HẢI QUAN ĐỐI VỚI HÀNG TẠM NHẬP TÁI XUẤT\n\nĐiều 47. Điều kiện, thời hạn TNTX: Thương nhân có đăng ký kinh doanh, có giấy phép (nếu cần), đặt cọc. Thời hạn 120 ngày, gia hạn tối đa 2 lần x 30 ngày.\n\nĐiều 48. Hàng bảo hành sửa chữa: Miễn thuế NK, thời hạn theo hợp đồng bảo hành (tối đa 12 tháng). Hồ sơ: tờ khai, hợp đồng bảo hành, chứng từ vận tải.\n\nĐiều 50. Các loại hình TNTX: Bảo hành sửa chữa (G13), trưng bày triển lãm, kinh doanh TNTX, máy móc thiết bị phục vụ công trình.",
     "status": "amended",
     "folder": "B",
-    "tags": ["thủ tục hải quan", "tạm nhập tái xuất", "TNTX", "bảo hành", "sửa chữa", "G13", "kiểm tra", "giám sát", "gia công", "SXXK"],
-    "relatedDocs": ["luat-hai-quan-2014", "nd-59-2018", "nd-167-2020", "tt-38-2015", "qd-1357-2021"]
+    "tags": [
+      "thủ tục hải quan",
+      "tạm nhập tái xuất",
+      "TNTX",
+      "bảo hành",
+      "sửa chữa",
+      "G13",
+      "kiểm tra",
+      "giám sát",
+      "gia công",
+      "SXXK"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "nd-59-2018",
+      "nd-167-2020",
+      "tt-38-2015",
+      "qd-1357-2021"
+    ]
   },
   {
     "id": "nd-59-2018",
@@ -233,8 +672,18 @@
     "content": "NGHỊ ĐỊNH 59/2018/NĐ-CP\nSửa đổi, bổ sung một số điều của Nghị định 08/2015/NĐ-CP\n\nĐiều 1. Sửa đổi, bổ sung một số điều:\nKhoản 30. Sửa đổi Điều 50: Bổ sung quy định rõ ràng về các loại hình tạm nhập tái xuất bao gồm bảo hành sửa chữa thay thế.\nKhoản 15. Sửa đổi về thủ tục khai hải quan điện tử: Bổ sung quy định về khai bổ sung, hủy tờ khai.\nKhoản 20. Bổ sung quy định về TMĐT xuyên biên giới.",
     "status": "active",
     "folder": "B",
-    "tags": ["sửa đổi", "NĐ 08", "thủ tục hải quan", "tạm nhập tái xuất", "thương mại điện tử", "khai hải quan"],
-    "relatedDocs": ["nd-08-2015", "nd-167-2020"]
+    "tags": [
+      "sửa đổi",
+      "NĐ 08",
+      "thủ tục hải quan",
+      "tạm nhập tái xuất",
+      "thương mại điện tử",
+      "khai hải quan"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "nd-167-2020"
+    ]
   },
   {
     "id": "nd-167-2020",
@@ -262,8 +711,17 @@
     "content": "NGHỊ ĐỊNH 167/2020/NĐ-CP về sửa đổi phụ lục NĐ 08/2015 đã sửa đổi bởi NĐ 59/2018. Cập nhật mã loại hình XNK mới, biểu mẫu tờ khai hải quan cho phù hợp VNACCS/VCIS và FTA mới.",
     "status": "active",
     "folder": "B",
-    "tags": ["sửa đổi", "NĐ 08", "mã loại hình", "tờ khai", "hải quan điện tử"],
-    "relatedDocs": ["nd-08-2015", "nd-59-2018"]
+    "tags": [
+      "sửa đổi",
+      "NĐ 08",
+      "mã loại hình",
+      "tờ khai",
+      "hải quan điện tử"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "nd-59-2018"
+    ]
   },
   {
     "id": "nd-134-2016",
@@ -293,8 +751,19 @@
     "content": "NGHỊ ĐỊNH 134/2016/NĐ-CP - Chi tiết Luật Thuế XNK\n\nĐiều 10. Miễn thuế hàng bảo hành sửa chữa: Hàng TNTX bảo hành sửa chữa được miễn thuế NK. Điều kiện: hợp đồng bảo hành, hàng đúng chủng loại.\n\nĐiều 12. Miễn thuế nguyên liệu gia công: Nguyên liệu NK để gia công XK được miễn thuế NK. Phải thanh khoản đúng hạn.\n\nĐiều 13. Hoàn thuế SXXK: Nguyên liệu NK để SX hàng XK được hoàn thuế NK khi sản phẩm thực XK.",
     "status": "active",
     "folder": "B",
-    "tags": ["thuế xuất nhập khẩu", "miễn thuế", "hoàn thuế", "tạm nhập tái xuất", "gia công", "SXXK", "trị giá hải quan"],
-    "relatedDocs": ["luat-thue-xnk-2016", "tt-38-2015"]
+    "tags": [
+      "thuế xuất nhập khẩu",
+      "miễn thuế",
+      "hoàn thuế",
+      "tạm nhập tái xuất",
+      "gia công",
+      "SXXK",
+      "trị giá hải quan"
+    ],
+    "relatedDocs": [
+      "luat-thue-xnk-2016",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "nd-18-2021",
@@ -322,8 +791,17 @@
     "content": "NGHỊ ĐỊNH 18/2021/NĐ-CP sửa đổi NĐ 134/2016 về thuế XNK. Bổ sung miễn thuế dự án đầu tư ưu đãi, sửa đổi hoàn thuế SXXK.",
     "status": "active",
     "folder": "B",
-    "tags": ["thuế XNK", "sửa đổi", "miễn thuế", "đầu tư ưu đãi", "hoàn thuế"],
-    "relatedDocs": ["nd-134-2016", "luat-thue-xnk-2016"]
+    "tags": [
+      "thuế XNK",
+      "sửa đổi",
+      "miễn thuế",
+      "đầu tư ưu đãi",
+      "hoàn thuế"
+    ],
+    "relatedDocs": [
+      "nd-134-2016",
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "nd-69-2018",
@@ -352,8 +830,16 @@
     "content": "NGHỊ ĐỊNH 69/2018/NĐ-CP - Chi tiết Luật Quản lý ngoại thương\n\nQuy định về hàng cấm XNK, hàng có điều kiện, TNTX, chuyển khẩu. Danh mục hàng cấm: vũ khí, ma túy, chất độc, chất thải nguy hại. Kinh doanh TNTX: thời hạn 120 ngày, cần giấy phép BCT cho một số mặt hàng.",
     "status": "active",
     "folder": "B",
-    "tags": ["quản lý ngoại thương", "hàng cấm", "tạm nhập tái xuất", "chuyển khẩu", "giấy phép"],
-    "relatedDocs": ["luat-qlnt-2017"]
+    "tags": [
+      "quản lý ngoại thương",
+      "hàng cấm",
+      "tạm nhập tái xuất",
+      "chuyển khẩu",
+      "giấy phép"
+    ],
+    "relatedDocs": [
+      "luat-qlnt-2017"
+    ]
   },
   {
     "id": "nd-128-2020",
@@ -382,8 +868,18 @@
     "content": "NGHỊ ĐỊNH 128/2020/NĐ-CP - Xử phạt VPHC lĩnh vực hải quan\n\nQuy định xử phạt: khai sai (10-20% thuế thiếu), quá hạn TNTX (5-10 triệu), buôn lậu (tịch thu + phạt), gian lận C/O (phạt nặng + truy thu).",
     "status": "active",
     "folder": "B",
-    "tags": ["xử phạt", "vi phạm", "hải quan", "khai sai", "buôn lậu", "trốn thuế", "mã HS"],
-    "relatedDocs": ["luat-hai-quan-2014"]
+    "tags": [
+      "xử phạt",
+      "vi phạm",
+      "hải quan",
+      "khai sai",
+      "buôn lậu",
+      "trốn thuế",
+      "mã HS"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "tt-38-2015",
@@ -424,8 +920,24 @@
     "content": "THÔNG TƯ 38/2015/TT-BTC\nQuy định về thủ tục hải quan; kiểm tra, giám sát hải quan; thuế XNK và quản lý thuế đối với hàng hóa XNK\n\nĐây là Thông tư quan trọng nhất hướng dẫn chi tiết NĐ 08/2015 về thủ tục hải quan.\n\nPhần I: QUY ĐỊNH CHUNG\nĐiều 1. Phạm vi điều chỉnh: Thông tư này quy định về thủ tục hải quan đối với hàng hóa XNK, quá cảnh; phương tiện vận tải XNC; kiểm tra, giám sát hải quan; thuế XNK.\n\nPhần II: THỦ TỤC HẢI QUAN\nChương III: Hàng gia công - Điều 51-70\nChương IV: Hàng SXXK - Điều 71-80\nChương V: Hàng TNTX - Điều 81-90\nChương VI: Kho ngoại quan - Điều 91-98\n\nPhần III: QUẢN LÝ THUẾ\nĐiều 100: Miễn thuế hàng gia công, SXXK, TNTX bảo hành\nĐiều 110: Hoàn thuế NK nguyên liệu SXXK\nĐiều 120: Truy thu thuế khi vi phạm",
     "status": "amended",
     "folder": "A",
-    "tags": ["thủ tục hải quan", "gia công", "SXXK", "tạm nhập tái xuất", "kho ngoại quan", "thuế", "miễn thuế", "hoàn thuế", "G13", "E21", "E31"],
-    "relatedDocs": ["nd-08-2015", "tt-39-2018", "luat-hai-quan-2014"]
+    "tags": [
+      "thủ tục hải quan",
+      "gia công",
+      "SXXK",
+      "tạm nhập tái xuất",
+      "kho ngoại quan",
+      "thuế",
+      "miễn thuế",
+      "hoàn thuế",
+      "G13",
+      "E21",
+      "E31"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "tt-39-2018",
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "tt-39-2018",
@@ -454,8 +966,18 @@
     "content": "THÔNG TƯ 39/2018/TT-BTC sửa đổi TT 38/2015. Cập nhật thủ tục gia công, SXXK, TMĐT, biểu mẫu tờ khai mới.",
     "status": "active",
     "folder": "A",
-    "tags": ["sửa đổi", "TT 38", "thủ tục hải quan", "gia công", "SXXK", "thương mại điện tử"],
-    "relatedDocs": ["tt-38-2015", "nd-59-2018"]
+    "tags": [
+      "sửa đổi",
+      "TT 38",
+      "thủ tục hải quan",
+      "gia công",
+      "SXXK",
+      "thương mại điện tử"
+    ],
+    "relatedDocs": [
+      "tt-38-2015",
+      "nd-59-2018"
+    ]
   },
   {
     "id": "tt-06-2021",
@@ -484,8 +1006,17 @@
     "content": "THÔNG TƯ 06/2021/TT-BTC hướng dẫn Luật Quản lý thuế trong lĩnh vực hải quan. Nộp thuế 10 ngày (ưu tiên 30 ngày), ấn định thuế khai sai, cưỡng chế nợ thuế.",
     "status": "active",
     "folder": "A",
-    "tags": ["quản lý thuế", "nộp thuế", "thời hạn", "cưỡng chế", "ấn định thuế", "VNACCS"],
-    "relatedDocs": ["luat-thue-xnk-2016"]
+    "tags": [
+      "quản lý thuế",
+      "nộp thuế",
+      "thời hạn",
+      "cưỡng chế",
+      "ấn định thuế",
+      "VNACCS"
+    ],
+    "relatedDocs": [
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "tt-38-2018-xx",
@@ -514,8 +1045,20 @@
     "content": "THÔNG TƯ 38/2018/TT-BTC về xuất xứ hàng hóa XNK. Quy tắc xuất xứ ưu đãi FTA, C/O Form D/E/AK/EUR.1, tự chứng nhận xuất xứ CPTPP/EVFTA.",
     "status": "amended",
     "folder": "A",
-    "tags": ["xuất xứ", "C/O", "quy tắc xuất xứ", "FTA", "CPTPP", "EVFTA", "ASEAN", "Form D", "EUR.1"],
-    "relatedDocs": ["tt-62-2019"]
+    "tags": [
+      "xuất xứ",
+      "C/O",
+      "quy tắc xuất xứ",
+      "FTA",
+      "CPTPP",
+      "EVFTA",
+      "ASEAN",
+      "Form D",
+      "EUR.1"
+    ],
+    "relatedDocs": [
+      "tt-62-2019"
+    ]
   },
   {
     "id": "tt-62-2019",
@@ -543,8 +1086,17 @@
     "content": "THÔNG TƯ 62/2019/TT-BTC sửa đổi TT 38/2018 về xuất xứ. Bổ sung CPTPP, tự chứng nhận xuất xứ.",
     "status": "active",
     "folder": "A",
-    "tags": ["xuất xứ", "CPTPP", "EVFTA", "sửa đổi", "tự chứng nhận", "De Minimis"],
-    "relatedDocs": ["tt-38-2018-xx"]
+    "tags": [
+      "xuất xứ",
+      "CPTPP",
+      "EVFTA",
+      "sửa đổi",
+      "tự chứng nhận",
+      "De Minimis"
+    ],
+    "relatedDocs": [
+      "tt-38-2018-xx"
+    ]
   },
   {
     "id": "tt-81-2019",
@@ -573,8 +1125,20 @@
     "content": "THÔNG TƯ 81/2019/TT-BTC - Quản lý rủi ro trong hải quan. Phân luồng xanh/vàng/đỏ, đánh giá tuân thủ DN, doanh nghiệp ưu tiên AEO.",
     "status": "active",
     "folder": "A",
-    "tags": ["quản lý rủi ro", "phân luồng", "luồng xanh", "luồng vàng", "luồng đỏ", "AEO", "tuân thủ", "doanh nghiệp ưu tiên"],
-    "relatedDocs": ["luat-hai-quan-2014", "tt-38-2015"]
+    "tags": [
+      "quản lý rủi ro",
+      "phân luồng",
+      "luồng xanh",
+      "luồng vàng",
+      "luồng đỏ",
+      "AEO",
+      "tuân thủ",
+      "doanh nghiệp ưu tiên"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "tt-07-2022",
@@ -603,8 +1167,18 @@
     "content": "THÔNG TƯ 07/2022/TT-BTC - Thuế GTGT hàng NK. Hàng NK thương mại: chịu GTGT. Hàng gia công, TNTX, quá cảnh: không chịu GTGT.",
     "status": "active",
     "folder": "A",
-    "tags": ["thuế GTGT", "hàng nhập khẩu", "VAT", "gia công", "tạm nhập tái xuất", "miễn thuế GTGT"],
-    "relatedDocs": ["luat-gtgt-2024", "tt-38-2015"]
+    "tags": [
+      "thuế GTGT",
+      "hàng nhập khẩu",
+      "VAT",
+      "gia công",
+      "tạm nhập tái xuất",
+      "miễn thuế GTGT"
+    ],
+    "relatedDocs": [
+      "luat-gtgt-2024",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "tt-33-2023",
@@ -632,8 +1206,15 @@
     "content": "THÔNG TƯ 33/2023/TT-BTC về phí hải quan. Mức phí 20.000đ/tờ khai, miễn phí hàng viện trợ, ngoại giao.",
     "status": "active",
     "folder": "A",
-    "tags": ["phí hải quan", "lệ phí", "quá cảnh", "tờ khai"],
-    "relatedDocs": ["luat-hai-quan-2014"]
+    "tags": [
+      "phí hải quan",
+      "lệ phí",
+      "quá cảnh",
+      "tờ khai"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "tt-31-2022",
@@ -662,8 +1243,18 @@
     "content": "THÔNG TƯ 31/2022/TT-BTC - Biểu thuế ưu đãi RCEP 2022-2027. Áp dụng cho hàng NK từ 15 nước RCEP với C/O hợp lệ.",
     "status": "active",
     "folder": "A",
-    "tags": ["RCEP", "thuế ưu đãi", "biểu thuế", "FTA", "xuất xứ", "C/O RCEP"],
-    "relatedDocs": ["tt-38-2018-xx", "luat-thue-xnk-2016"]
+    "tags": [
+      "RCEP",
+      "thuế ưu đãi",
+      "biểu thuế",
+      "FTA",
+      "xuất xứ",
+      "C/O RCEP"
+    ],
+    "relatedDocs": [
+      "tt-38-2018-xx",
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "qd-1357-2021",
@@ -707,8 +1298,25 @@
     "content": "QUYẾT ĐỊNH 1357/QĐ-TCHQ ngày 18/05/2021 của Tổng cục Hải quan\nBan hành Bảng mã loại hình xuất khẩu, nhập khẩu\n\nBẢNG MÃ LOẠI HÌNH (trích):\n\nI. NHẬP KHẨU:\n- A11: NK kinh doanh nộp thuế ngay\n- A12: NK kinh doanh miễn thuế\n- A31: NK từ khu phi thuế quan\n- A41: NK đầu tư miễn thuế\n\nII. GIA CÔNG:\n- E21: NK nguyên liệu gia công\n- E52: XK sản phẩm gia công\n\nIII. SXXK:\n- E31: NK nguyên liệu SXXK\n- E62: XK sản phẩm SXXK\n\nIV. TẠM NHẬP TÁI XUẤT:\n- G11: Tạm nhập kinh doanh TNTX\n- G12: Tạm nhập trưng bày triển lãm\n- G13: Tạm nhập miễn thuế bảo hành sửa chữa\n- G14: Tạm nhập máy móc phục vụ công trình\n- G21: Tạm xuất tái nhập\n- G23: Tái xuất hàng tạm nhập\n\nMục 19 - G13: Tạm nhập miễn thuế cho hàng hóa tạm nhập để bảo hành, sửa chữa, thay thế. Đây là trường hợp 'tạm nhập - tái xuất', KHÔNG phải 'tái nhập' hàng hóa bị trả lại.",
     "status": "active",
     "folder": "E",
-    "tags": ["mã loại hình", "VNACCS", "G13", "A11", "E21", "E31", "tạm nhập", "bảo hành", "sửa chữa", "gia công", "SXXK", "tờ khai"],
-    "relatedDocs": ["nd-08-2015", "tt-38-2015", "cv-1236-tntx"]
+    "tags": [
+      "mã loại hình",
+      "VNACCS",
+      "G13",
+      "A11",
+      "E21",
+      "E31",
+      "tạm nhập",
+      "bảo hành",
+      "sửa chữa",
+      "gia công",
+      "SXXK",
+      "tờ khai"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "tt-38-2015",
+      "cv-1236-tntx"
+    ]
   },
   {
     "id": "qd-1966-tchq",
@@ -738,8 +1346,18 @@
     "content": "QUYẾT ĐỊNH 1966/QĐ-TCHQ - Quy trình thủ tục HQ điện tử. Tiếp nhận tờ khai VNACCS → Phân luồng tự động → Kiểm tra (nếu cần) → Thông quan → Giải phóng hàng.",
     "status": "active",
     "folder": "E",
-    "tags": ["quy trình", "hải quan điện tử", "VNACCS", "thông quan", "phân luồng", "giải phóng hàng"],
-    "relatedDocs": ["tt-38-2015", "tt-81-2019"]
+    "tags": [
+      "quy trình",
+      "hải quan điện tử",
+      "VNACCS",
+      "thông quan",
+      "phân luồng",
+      "giải phóng hàng"
+    ],
+    "relatedDocs": [
+      "tt-38-2015",
+      "tt-81-2019"
+    ]
   },
   {
     "id": "cv-1236-tntx",
@@ -775,8 +1393,21 @@
     "content": "CÔNG VĂN 1236/TCHQ-GSQL ngày 15/03/2024\nV/v hướng dẫn thủ tục tạm nhập tái xuất hàng hóa bảo hành, sửa chữa\n\nKính gửi: Cục Hải quan các tỉnh, thành phố\n\nTổng cục Hải quan hướng dẫn thủ tục TNTX bảo hành sửa chữa:\n\n1. Tạm nhập: Khai mã G13, miễn thuế NK, không chịu thuế GTGT\n2. Tái xuất: Khai mã G23, tham chiếu G13\n3. Thời hạn: Theo hợp đồng bảo hành, tối đa 12 tháng\n4. Đặt cọc: 2% giá trị (một số trường hợp)\n\nLưu ý: Đây là loại hình 'tạm nhập - tái xuất', KHÔNG phải 'tái nhập' hàng bị trả lại.",
     "status": "active",
     "folder": "E",
-    "tags": ["tạm nhập tái xuất", "TNTX", "bảo hành", "sửa chữa", "G13", "G23", "miễn thuế", "thủ tục"],
-    "relatedDocs": ["qd-1357-2021", "nd-08-2015", "luat-thue-xnk-2016"]
+    "tags": [
+      "tạm nhập tái xuất",
+      "TNTX",
+      "bảo hành",
+      "sửa chữa",
+      "G13",
+      "G23",
+      "miễn thuế",
+      "thủ tục"
+    ],
+    "relatedDocs": [
+      "qd-1357-2021",
+      "nd-08-2015",
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "cv-15110-2026",
@@ -806,8 +1437,22 @@
     "content": "CÔNG VĂN 15110/CHQ-NVTHQ ngày 10/04/2026\n\nKể từ ngày 01/07/2025, trường hợp sản phẩm gia công, sản xuất xuất khẩu tái nhập khẩu trở lại Việt Nam thì thuộc đối tượng chịu thuế GTGT theo quy định tại Điều 3 Luật thuế GTGT số 48/2024/QH15.\n\nPhân biệt:\n1. Tái nhập (Điều 47 NĐ 08/2015): Hàng XK bị trả lại → Chịu thuế GTGT từ 01/07/2025\n2. Tạm nhập bảo hành G13: Hàng NK bảo hành sửa chữa rồi tái xuất → KHÔNG chịu thuế GTGT\n\nĐiều 50 NĐ 08/2015 (sửa đổi bởi NĐ 59/2018 và NĐ 167/2020) quy định rõ: hàng hóa nhập khẩu để bảo hành, sửa chữa, thay thế thuộc nhóm 'tạm nhập - tái xuất', không phải 'tái nhập' hàng bị trả lại.",
     "status": "active",
     "folder": "E",
-    "tags": ["thuế GTGT", "gia công", "SXXK", "tái nhập", "tạm nhập", "bảo hành", "G13", "48/2024/QH15"],
-    "relatedDocs": ["luat-gtgt-2024", "nd-08-2015", "qd-1357-2021", "cv-1236-tntx"]
+    "tags": [
+      "thuế GTGT",
+      "gia công",
+      "SXXK",
+      "tái nhập",
+      "tạm nhập",
+      "bảo hành",
+      "G13",
+      "48/2024/QH15"
+    ],
+    "relatedDocs": [
+      "luat-gtgt-2024",
+      "nd-08-2015",
+      "qd-1357-2021",
+      "cv-1236-tntx"
+    ]
   },
   {
     "id": "cv-5765-gia-cong",
@@ -837,8 +1482,18 @@
     "content": "CÔNG VĂN 5765/TCHQ-TXNK - Thuế NK hàng gia công. Nguyên liệu (E21): miễn thuế. Máy móc thuê mượn (E23): miễn thuế. Chuyển nội địa: nộp thuế NK + GTGT. Thanh khoản 60 ngày.",
     "status": "active",
     "folder": "E",
-    "tags": ["gia công", "thuế nhập khẩu", "miễn thuế", "nguyên liệu", "E21", "thanh khoản"],
-    "relatedDocs": ["tt-38-2015", "nd-134-2016"]
+    "tags": [
+      "gia công",
+      "thuế nhập khẩu",
+      "miễn thuế",
+      "nguyên liệu",
+      "E21",
+      "thanh khoản"
+    ],
+    "relatedDocs": [
+      "tt-38-2015",
+      "nd-134-2016"
+    ]
   },
   {
     "id": "cv-3921-tmdt",
@@ -867,8 +1522,19 @@
     "content": "CÔNG VĂN 3921/TCHQ-GSQL - Thủ tục HQ hàng TMĐT. Hàng NK qua TMĐT phải khai HQ, nộp thuế. Sàn TMĐT xuyên biên giới phải đăng ký với cơ quan thuế.",
     "status": "active",
     "folder": "E",
-    "tags": ["thương mại điện tử", "TMĐT", "Shopee", "Lazada", "Amazon", "xuất nhập khẩu", "thuế"],
-    "relatedDocs": ["tt-39-2018", "luat-hai-quan-2014"]
+    "tags": [
+      "thương mại điện tử",
+      "TMĐT",
+      "Shopee",
+      "Lazada",
+      "Amazon",
+      "xuất nhập khẩu",
+      "thuế"
+    ],
+    "relatedDocs": [
+      "tt-39-2018",
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "cv-2845-tntx",
@@ -897,8 +1563,20 @@
     "content": "CÔNG VĂN 2845/TCHQ-GSQL - Quản lý hàng TNTX. Thời hạn 120 ngày + 2x30 ngày gia hạn. Quá hạn: phạt 5-10 triệu. Chuyển nội địa trái phép: tịch thu + phạt nặng.",
     "status": "active",
     "folder": "E",
-    "tags": ["tạm nhập tái xuất", "TNTX", "thời hạn", "vi phạm", "xử phạt", "quản lý", "120 ngày"],
-    "relatedDocs": ["nd-08-2015", "nd-128-2020", "cv-1236-tntx"]
+    "tags": [
+      "tạm nhập tái xuất",
+      "TNTX",
+      "thời hạn",
+      "vi phạm",
+      "xử phạt",
+      "quản lý",
+      "120 ngày"
+    ],
+    "relatedDocs": [
+      "nd-08-2015",
+      "nd-128-2020",
+      "cv-1236-tntx"
+    ]
   },
   {
     "id": "cv-4185-kho-ngoai-quan",
@@ -928,8 +1606,17 @@
     "content": "CÔNG VĂN 4185/TCHQ-GSQL - Kho ngoại quan. Lưu kho tối đa 12+12 tháng. Chưa nộp thuế NK. Đưa ra: NK (nộp thuế) hoặc XK nước thứ 3.",
     "status": "active",
     "folder": "E",
-    "tags": ["kho ngoại quan", "lưu kho", "thủ tục", "thuế", "logistics"],
-    "relatedDocs": ["luat-hai-quan-2014", "tt-38-2015"]
+    "tags": [
+      "kho ngoại quan",
+      "lưu kho",
+      "thủ tục",
+      "thuế",
+      "logistics"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "cv-6234-qua-canh",
@@ -958,8 +1645,16 @@
     "content": "CÔNG VĂN 6234/TCHQ-TXNK - Thuế hàng quá cảnh. Không thuế NK/XK/GTGT. Nộp phí giám sát HQ. Thời hạn 30 ngày. Đi đúng tuyến đường.",
     "status": "active",
     "folder": "E",
-    "tags": ["quá cảnh", "miễn thuế", "phí giám sát", "tuyến đường"],
-    "relatedDocs": ["luat-hai-quan-2014", "tt-33-2023"]
+    "tags": [
+      "quá cảnh",
+      "miễn thuế",
+      "phí giám sát",
+      "tuyến đường"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "tt-33-2023"
+    ]
   },
   {
     "id": "nd-35-2022",
@@ -988,8 +1683,18 @@
     "content": "NGHỊ ĐỊNH 35/2022/NĐ-CP - Quản lý KCN/KKT. DNCX = khu phi thuế quan. Miễn thuế NK nguyên liệu SX hàng XK. Bán nội địa: nộp thuế NK + GTGT.",
     "status": "active",
     "folder": "B",
-    "tags": ["khu công nghiệp", "khu kinh tế", "doanh nghiệp chế xuất", "DNCX", "khu phi thuế quan", "miễn thuế"],
-    "relatedDocs": ["luat-hai-quan-2014", "tt-38-2015"]
+    "tags": [
+      "khu công nghiệp",
+      "khu kinh tế",
+      "doanh nghiệp chế xuất",
+      "DNCX",
+      "khu phi thuế quan",
+      "miễn thuế"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "tt-38-2015"
+    ]
   },
   {
     "id": "tt-cptpp-2019",
@@ -1019,8 +1724,21 @@
     "content": "THÔNG TƯ 03/2019/TT-BCT - Quy tắc xuất xứ CPTPP. CTC/RVC ≥ 40%, De Minimis 10%, tích lũy 11 nước, tự chứng nhận xuất xứ.",
     "status": "active",
     "folder": "A",
-    "tags": ["CPTPP", "xuất xứ", "quy tắc xuất xứ", "De Minimis", "tích lũy", "tự chứng nhận", "RVC", "CTC", "FTA"],
-    "relatedDocs": ["tt-38-2018-xx", "tt-62-2019"]
+    "tags": [
+      "CPTPP",
+      "xuất xứ",
+      "quy tắc xuất xứ",
+      "De Minimis",
+      "tích lũy",
+      "tự chứng nhận",
+      "RVC",
+      "CTC",
+      "FTA"
+    ],
+    "relatedDocs": [
+      "tt-38-2018-xx",
+      "tt-62-2019"
+    ]
   },
   {
     "id": "tt-evfta-2020",
@@ -1050,8 +1768,20 @@
     "content": "THÔNG TƯ 11/2020/TT-BCT - Quy tắc xuất xứ EVFTA. C/O EUR.1, REX tự chứng nhận, dệt may 'từ vải trở đi', MaxNOM, tích lũy VN-EU.",
     "status": "active",
     "folder": "A",
-    "tags": ["EVFTA", "EU", "xuất xứ", "EUR.1", "REX", "dệt may", "tự chứng nhận", "FTA"],
-    "relatedDocs": ["tt-38-2018-xx", "tt-62-2019"]
+    "tags": [
+      "EVFTA",
+      "EU",
+      "xuất xứ",
+      "EUR.1",
+      "REX",
+      "dệt may",
+      "tự chứng nhận",
+      "FTA"
+    ],
+    "relatedDocs": [
+      "tt-38-2018-xx",
+      "tt-62-2019"
+    ]
   },
   {
     "id": "tt-chong-ban-pha-gia",
@@ -1081,8 +1811,18 @@
     "content": "THÔNG TƯ 37/2019/TT-BCT - Phòng vệ thương mại. Chống bán phá giá: thuế CBPG ≤ biên độ phá giá, 5 năm. Chống trợ cấp: thuế CCT. Tự vệ: khi NK tăng đột biến.",
     "status": "active",
     "folder": "A",
-    "tags": ["phòng vệ thương mại", "chống bán phá giá", "chống trợ cấp", "thuế tự vệ", "điều tra", "bảo hộ"],
-    "relatedDocs": ["luat-qlnt-2017", "luat-thue-xnk-2016"]
+    "tags": [
+      "phòng vệ thương mại",
+      "chống bán phá giá",
+      "chống trợ cấp",
+      "thuế tự vệ",
+      "điều tra",
+      "bảo hộ"
+    ],
+    "relatedDocs": [
+      "luat-qlnt-2017",
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "tt-kiem-tra-chuyen-nganh",
@@ -1112,8 +1852,17 @@
     "content": "THÔNG TƯ 13/2023/TT-BNNPTNT - Kiểm tra chuyên ngành hàng NK nông nghiệp. Kiểm dịch thực vật, động vật, ATVSTP. Thời gian 1-5 ngày. Không đạt: trả lại/tiêu hủy.",
     "status": "active",
     "folder": "A",
-    "tags": ["kiểm tra chuyên ngành", "kiểm dịch", "an toàn thực phẩm", "nông nghiệp", "nhập khẩu", "kiểm dịch thực vật"],
-    "relatedDocs": ["luat-hai-quan-2014"]
+    "tags": [
+      "kiểm tra chuyên ngành",
+      "kiểm dịch",
+      "an toàn thực phẩm",
+      "nông nghiệp",
+      "nhập khẩu",
+      "kiểm dịch thực vật"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "nq-128-2020",
@@ -1142,8 +1891,18 @@
     "content": "NGHỊ QUYẾT 128/2020/QH14 - Mục tiêu XNK: tăng 5-6%. Giảm thời gian thông quan. NSW, ASW. Cắt giảm 50% KTCN.",
     "status": "active",
     "folder": "C",
-    "tags": ["nghị quyết", "XNK", "thông quan", "cải cách", "hải quan điện tử", "NSW", "kiểm tra chuyên ngành"],
-    "relatedDocs": ["luat-hai-quan-2014"]
+    "tags": [
+      "nghị quyết",
+      "XNK",
+      "thông quan",
+      "cải cách",
+      "hải quan điện tử",
+      "NSW",
+      "kiểm tra chuyên ngành"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014"
+    ]
   },
   {
     "id": "nq-huong-dan-xnk-2023",
@@ -1173,8 +1932,18 @@
     "content": "NGHỊ QUYẾT 58/NQ-CP - Hỗ trợ DN XNK. Giảm GTGT 8%, đơn giản thủ tục HQ, hỗ trợ tín dụng, mở rộng thị trường qua FTA.",
     "status": "active",
     "folder": "C",
-    "tags": ["hỗ trợ doanh nghiệp", "XNK", "giảm thuế GTGT", "thủ tục hải quan", "FTA", "tín dụng"],
-    "relatedDocs": ["luat-hai-quan-2014", "luat-thue-xnk-2016"]
+    "tags": [
+      "hỗ trợ doanh nghiệp",
+      "XNK",
+      "giảm thuế GTGT",
+      "thủ tục hải quan",
+      "FTA",
+      "tín dụng"
+    ],
+    "relatedDocs": [
+      "luat-hai-quan-2014",
+      "luat-thue-xnk-2016"
+    ]
   },
   {
     "id": "cv-hang-cam",
@@ -1204,7 +1973,18 @@
     "content": "CÔNG VĂN 7521/TCHQ-GSQL - Tăng cường kiểm tra hàng cấm, hàng giả, SHTT. Soi chiếu 100% container rủi ro, kiểm tra bưu kiện, phối hợp công an, tịch thu tiêu hủy.",
     "status": "active",
     "folder": "E",
-    "tags": ["hàng cấm", "hàng giả", "sở hữu trí tuệ", "SHTT", "kiểm tra", "tịch thu", "cửa khẩu"],
-    "relatedDocs": ["nd-128-2020", "luat-qlnt-2017"]
+    "tags": [
+      "hàng cấm",
+      "hàng giả",
+      "sở hữu trí tuệ",
+      "SHTT",
+      "kiểm tra",
+      "tịch thu",
+      "cửa khẩu"
+    ],
+    "relatedDocs": [
+      "nd-128-2020",
+      "luat-qlnt-2017"
+    ]
   }
 ]
