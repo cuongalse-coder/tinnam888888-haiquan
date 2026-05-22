@@ -950,17 +950,20 @@ def render_footer():
 def main():
     documents = load_documents()
 
-    # Auto-update status banner
-    try:
-        data_path = Path(__file__).parent / "data" / "legal-documents.json"
-        mtime = os.path.getmtime(data_path)
-        last_updated = datetime.fromtimestamp(mtime).strftime('%H:%M - %d/%m/%Y')
-        st.success(f"⚡ **Hệ thống Auto-Update AI:** Kho dữ liệu (gồm {len(documents)} văn bản) được đồng bộ lần cuối lúc **{last_updated}**.")
-    except Exception as e:
-        pass
-
     # Header
     render_header()
+
+    # Auto-update status banner
+    try:
+        from datetime import timedelta
+        data_path = Path(__file__).parent / "data" / "legal-documents.json"
+        mtime = os.path.getmtime(data_path)
+        dt_utc = datetime.utcfromtimestamp(mtime)
+        dt_vn = dt_utc + timedelta(hours=7)
+        last_updated = dt_vn.strftime('%H:%M - %d/%m/%Y')
+        st.success(f"⚡ **Hệ thống Auto-Update AI:** Kho dữ liệu (gồm {len(documents)} văn bản) được đồng bộ lần cuối lúc **{last_updated} (Giờ VN)**.")
+    except Exception as e:
+        pass
 
     # Search
     col_search, col_btn = st.columns([6, 1])
