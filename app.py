@@ -1233,7 +1233,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_date"] = get_vn_time().date()
         stats["api_calls"] = 0
         
-    last_error = ""
+       last_error = ""
     # Giai đoạn 1: Vắt kiệt bản PRO trên TẤT CẢ các Key
     for current_key in api_keys:
         if not current_key: continue
@@ -1254,7 +1254,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text
             stats["api_calls"] += 1
@@ -1268,7 +1268,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text
             stats["api_calls"] += 1
@@ -1278,7 +1278,6 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             if "quota" in str(e).lower() or "429" in str(e):
                 last_error = "quota"
             continue
-
     if last_error == "quota":
         return "⚠️ **Hệ thống đã thử toàn bộ API Keys nhưng đều đã Quá tải hoặc Hết lượt AI miễn phí!**\n\n*(Lưu ý: Bạn có thể nhập nhiều API Key cùng lúc, cách nhau bằng dấu phẩy `,`)*\n\nGoogle giới hạn tài khoản miễn phí ở 2 mức:\n1. **Giới hạn tốc độ (15 câu / phút):** Bạn đang hỏi quá nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.\n2. **Giới hạn ngày (1500 câu / ngày):** Vui lòng [vào đây](https://aistudio.google.com/app/apikey) bằng tài khoản Gmail khác để lấy Key mới và dán nối tiếp vào phần cài đặt theo dạng `KEY1, KEY2, KEY3`."
         
