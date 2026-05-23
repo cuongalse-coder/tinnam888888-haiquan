@@ -1235,18 +1235,19 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         try:
             genai.configure(api_key=current_key)
             try:
-                # Kích hoạt công cụ tra cứu Google Search (hỗ trợ gemini-1.5-flash)
-                model = genai.GenerativeModel('gemini-1.5-pro', tools='google_search_retrieval')
+                # Dùng model mạnh nhất hiện tại là gemini-2.5-pro
+                model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search_retrieval')
                 response = model.generate_content(prompt)
                 text = response.text
             except Exception:
                 try:
-                    # Fallback cách cũ nếu SDK không hỗ trợ truyền string 'google_search_retrieval'
-                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    # Fallback sang bản flash nếu bản pro lỗi hoặc quá tải
+                    model = genai.GenerativeModel('gemini-2.5-flash')
                     response = model.generate_content(prompt)
                     text = response.text
                 except Exception:
-                    model = genai.GenerativeModel('gemini-1.5-pro')
+                    # Fallback lớp 3 xuống 2.0 hoặc 1.5 pro
+                    model = genai.GenerativeModel('gemini-2.0-flash')
                     response = model.generate_content(prompt)
                     text = response.text
             stats["api_calls"] += 1
