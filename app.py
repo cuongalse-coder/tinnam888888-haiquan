@@ -1290,7 +1290,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             last_error = str(e)
             continue
 
-    # Giai đoạn 5: Trùm cuối 3.1 Pro (KHÔNG Search) - Lập luận đỉnh cao nhất
+    # Giai đoạn 5: Trùm cuối 3.1 Pro (KHÔNG Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
@@ -1304,14 +1304,42 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             last_error = str(e)
             continue
 
-    # Giai đoạn 6: Lớp bảo vệ (Gemini flash-lite-latest KHÔNG Search)
+    # Giai đoạn 6: Trùm cuối 2.5 Pro (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.5-pro')
+            response = model.generate_content(prompt)
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 6 (Gemini 2.5 Pro - Bản Offline Thế Hệ Trị Giá Cao)*"
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # Giai đoạn 7: Tốc độ cao 2.5 Flash (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            response = model.generate_content(prompt)
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline Thông Minh Tốc Độ)*"
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # Giai đoạn 8: Lớp bảo vệ (Gemini flash-lite-latest KHÔNG Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-flash-lite-latest')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 6 (Gemini Flash Lite - Bản offline an toàn)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 8 (Gemini Flash Lite - Bản offline an toàn)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
