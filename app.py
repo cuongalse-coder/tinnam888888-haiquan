@@ -1234,105 +1234,105 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_calls"] = 0
         
     last_error = ""
-    # Giai đoạn 1: Trùm cuối Deep Research (deep-research-max-preview-04-2026 + Search)
+    # Giai đoạn 1: Trùm cuối Deep Research (CÓ Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('deep-research-max-preview-04-2026', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Deep Research Max)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Deep Research Max + Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 2: Trùm cuối Pro 3.1 (gemini-3.1-pro-preview + Search)
+    # Giai đoạn 2: Trùm cuối 3.1 Pro (CÓ Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-3.1-pro-preview', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 3.1 Pro)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 3.1 Pro + Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 3: Trùm cuối Pro Latest (gemini-pro-latest + Search)
-    for current_key in api_keys:
-        if not current_key: continue
-        try:
-            genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-pro-latest', tools='google_search_retrieval')
-            response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 3 (Gemini Pro Latest)*"
-            stats["api_calls"] += 1
-            return text
-        except Exception as e:
-            last_error = str(e)
-            continue
-
-    # Giai đoạn 4: Mạnh nhất (Gemini 3.5 Flash + Search)
+    # Giai đoạn 3: Mạnh nhất 3.5 Flash (CÓ Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-3.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 4 (Gemini 3.5 Flash)*"
-            stats["api_calls"] += 1
-            return text
-        except Exception as e:
-            last_error = str(e)
-            continue
-            
-    # Giai đoạn 5: Nhanh nhạy (Gemini flash-latest + Search)
-    for current_key in api_keys:
-        if not current_key: continue
-        try:
-            genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-flash-latest', tools='google_search_retrieval')
-            response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 5 (Gemini Flash Latest)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 3 (Gemini 3.5 Flash + Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 6: Rất nhẹ (Gemini 2.0 Flash Lite + Search)
+    # Giai đoạn 4: Trùm cuối Deep Research (KHÔNG Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash-lite', tools='google_search_retrieval')
+            model = genai.GenerativeModel('deep-research-max-preview-04-2026')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 6 (Gemini 2.0 Flash Lite)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 4 (Deep Research Max - Không mạng)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 7: Siêu nhẹ (Gemini flash-lite-latest + Search)
+    # Giai đoạn 5: Trùm cuối 3.1 Pro (KHÔNG Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-flash-lite-latest', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-3.1-pro-preview')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini Flash Lite Latest)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 5 (Gemini 3.1 Pro - Không mạng)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 8: Lớp bảo vệ (Gemini flash-lite-latest Không Search)
+    # Giai đoạn 6: Trùm cuối Pro Latest (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-pro-latest')
+            response = model.generate_content(prompt)
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 6 (Gemini Pro Latest - Không mạng)*"
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # Giai đoạn 7: Mạnh nhất 3.5 Flash (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-3.5-flash')
+            response = model.generate_content(prompt)
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 3.5 Flash - Không mạng)*"
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # Giai đoạn 8: Lớp bảo vệ (Gemini flash-lite-latest KHÔNG Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
