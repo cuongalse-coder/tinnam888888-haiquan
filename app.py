@@ -1195,14 +1195,14 @@ def call_gemini_api(query, context_docs, api_key, domain):
 - CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi, bổ sung bởi Nghị định 310/2025/NĐ-CP. Bắt buộc phải áp dụng các Luật, Nghị định năm 2025/2026 này, KHÔNG ĐƯỢC dùng Luật cũ!
 - BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU (thuvienphapluat.vn, chinhphu.vn, luatvietnam.vn, haiquanonline...).
 - TUYỆT ĐỐI KHÔNG DÙNG KIẾN THỨC CŨ. Mọi câu trả lời phải lấy dữ liệu thực tế ngay tại thời điểm tra cứu trên Internet. Bắt buộc ghi rõ Nguồn tra cứu.
-- BẮT BUỘC TRÌNH BÀY thông tin Thuế, HS Code, mức phạt dưới dạng BẢNG (Table) Markdown."""
+- BẮT BUỘC TRÌNH BÀY thông tin Thuế, HS Code, mức phạt theo dạng danh sách gạch đầu dòng (Bullet points). TUYỆT ĐỐI KHÔNG SỬ DỤNG BẢNG (TABLE) VÌ SẼ BỊ LỖI HIỂN THỊ."""
     else:
         role_desc = "một Kế toán trưởng kiêm Chuyên gia tư vấn Thuế am hiểu sâu sắc luật kế toán Việt Nam cập nhật đến năm 2026."
         special_instructions = """ĐẶC BIỆT LƯU Ý VỀ KẾ TOÁN VÀ THUẾ NỘI ĐỊA NĂM 2026:
 - CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi bởi Nghị định 310/2025/NĐ-CP. Thông tư 200/2014/TT-BTC ĐÃ BỊ THAY THẾ bởi Thông tư 99/2025/TT-BTC. Bắt buộc phải áp dụng các Luật, Nghị định, Thông tư năm 2025/2026 này! TUYỆT ĐỐI KHÔNG DÙNG LUẬT CŨ.
 - BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU.
 - TUYỆT ĐỐI KHÔNG DÙNG KIẾN THỨC CŨ. Mọi câu trả lời phải dựa 100% vào dữ liệu thực tế tra cứu được trên Internet. Bắt buộc ghi rõ Nguồn tra cứu.
-- BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt thành dạng BẢNG (Table) Markdown."""
+- BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt theo dạng danh sách gạch đầu dòng (Bullet points). TUYỆT ĐỐI KHÔNG SỬ DỤNG BẢNG (TABLE) VÌ SẼ BỊ LỖI HIỂN THỊ."""
 
     from datetime import datetime
     current_time_str = datetime.now().strftime('%H:%M:%S ngày %d/%m/%Y')
