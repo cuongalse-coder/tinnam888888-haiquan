@@ -22,6 +22,7 @@ from utils.search_engine import (
     get_unique_values,
     get_all_tags,
 )
+from utils.ai_search import perform_ai_search
 
 # =============================================
 # PAGE CONFIG
@@ -464,19 +465,43 @@ def page_search():
     page_num = st.session_state.get("page_num", 1)
     page_size = 15
 
-    results, total_count = search_documents(
-        documents=documents,
-        query=query,
-        doc_type=selected_type,
-        category=effective_category,
-        status=selected_status,
-        authority=selected_authority,
-        date_from=date_from.strftime("%Y-%m-%d") if date_from else None,
-        date_to=date_to.strftime("%Y-%m-%d") if date_to else None,
-        sort_by=sort_mapping.get(sort_by, "date"),
-        page=page_num,
-        page_size=page_size,
-    )
+    if query:
+        # AI SEARCH MODE
+        with st.spinner("🤖 Trợ lý AI đang tìm kiếm và đọc các thông tư, nghị định mới nhất trên Internet..."):
+            ai_results = perform_ai_search(query, api_key="")
+            if ai_results:
+                results = ai_results
+                total_count = len(results)
+            else:
+                # Fallback to local DB if AI fails to return JSON
+                results, total_count = search_documents(
+                    documents=documents,
+                    query=query,
+                    doc_type=selected_type,
+                    category=effective_category,
+                    status=selected_status,
+                    authority=selected_authority,
+                    date_from=date_from.strftime("%Y-%m-%d") if date_from else None,
+                    date_to=date_to.strftime("%Y-%m-%d") if date_to else None,
+                    sort_by=sort_mapping.get(sort_by, "date"),
+                    page=page_num,
+                    page_size=page_size,
+                )
+    else:
+        # LOCAL MODE (NO QUERY)
+        results, total_count = search_documents(
+            documents=documents,
+            query=query,
+            doc_type=selected_type,
+            category=effective_category,
+            status=selected_status,
+            authority=selected_authority,
+            date_from=date_from.strftime("%Y-%m-%d") if date_from else None,
+            date_to=date_to.strftime("%Y-%m-%d") if date_to else None,
+            sort_by=sort_mapping.get(sort_by, "date"),
+            page=page_num,
+            page_size=page_size,
+        )
 
     # === Results Header ===
     st.markdown("")
