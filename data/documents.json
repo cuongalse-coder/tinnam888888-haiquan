@@ -1,6 +1,6 @@
 {
   "last_updated": "2026-05-23T08:00:00+07:00",
-  "total_documents": 70,
+  "total_documents": 75,
   "sources": ["customs.gov.vn", "thuvienphapluat.vn", "vbpl.vn"],
   "documents": [
     {
@@ -1052,6 +1052,81 @@
       "url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=85-2026",
       "nguon": "vbpl.vn",
       "tags": ["khu thương mại tự do", "miễn thuế", "Đà Nẵng", "Hải Phòng"]
+    },
+    {
+      "id": "doc_071",
+      "so_hieu": "33/2023/TT-BTC",
+      "tieu_de": "Thông tư quy định về xác định xuất xứ hàng hóa xuất khẩu, nhập khẩu",
+      "loai_van_ban": "Thông tư",
+      "co_quan_ban_hanh": "Bộ Tài chính",
+      "ngay_ban_hanh": "2023-05-31",
+      "ngay_hieu_luc": "2023-07-15",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Hải quan",
+      "tom_tat": "Quy định hồ sơ, thủ tục kiểm tra, xác minh xuất xứ hàng hóa xuất khẩu, nhập khẩu (C/O); trường hợp từ chối chứng từ chứng nhận xuất xứ; xử lý vi phạm về C/O.",
+      "url": "https://customs.gov.vn/",
+      "nguon": "customs.gov.vn",
+      "tags": ["C/O", "xuất xứ hàng hóa", "xác minh xuất xứ", "hồ sơ C/O"]
+    },
+    {
+      "id": "doc_072",
+      "so_hieu": "05/2018/TT-BCT",
+      "tieu_de": "Thông tư quy định về xuất xứ hàng hóa",
+      "loai_van_ban": "Thông tư",
+      "co_quan_ban_hanh": "Bộ Công Thương",
+      "ngay_ban_hanh": "2018-04-03",
+      "ngay_hieu_luc": "2018-04-03",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Xuất nhập khẩu",
+      "tom_tat": "Quy tắc xuất xứ hàng hóa ưu đãi và không ưu đãi; hồ sơ, thủ tục cấp Giấy chứng nhận xuất xứ hàng hóa (C/O) và tự chứng nhận xuất xứ.",
+      "url": "https://thuvienphapluat.vn/",
+      "nguon": "thuvienphapluat.vn",
+      "tags": ["C/O", "quy tắc xuất xứ", "cấp C/O"]
+    },
+    {
+      "id": "doc_073",
+      "so_hieu": "31/2018/NĐ-CP",
+      "tieu_de": "Nghị định quy định chi tiết Luật Quản lý ngoại thương về xuất xứ hàng hóa",
+      "loai_van_ban": "Nghị định",
+      "co_quan_ban_hanh": "Chính phủ",
+      "ngay_ban_hanh": "2018-03-08",
+      "ngay_hieu_luc": "2018-03-08",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Thương mại quốc tế",
+      "tom_tat": "Các nguyên tắc, quy định chung về xuất xứ hàng hóa (C/O); tiêu chí xuất xứ (WO, CTC, RVC); cơ chế cấp và xác minh Giấy chứng nhận xuất xứ C/O.",
+      "url": "https://vbpl.vn/",
+      "nguon": "vbpl.vn",
+      "tags": ["C/O", "Luật Quản lý ngoại thương", "RVC", "CTC", "WO"]
+    },
+    {
+      "id": "doc_074",
+      "so_hieu": "05/2022/TT-BCT",
+      "tieu_de": "Thông tư quy định Quy tắc xuất xứ hàng hóa trong Hiệp định Đối tác Kinh tế Toàn diện Khu vực (RCEP)",
+      "loai_van_ban": "Thông tư",
+      "co_quan_ban_hanh": "Bộ Công Thương",
+      "ngay_ban_hanh": "2022-02-18",
+      "ngay_hieu_luc": "2022-04-04",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Thương mại quốc tế",
+      "tom_tat": "Hướng dẫn cụ thể về quy tắc xuất xứ hàng hóa, thủ tục cấp C/O mẫu RCEP, tự chứng nhận xuất xứ, và kiểm tra xác minh C/O trong khuôn khổ Hiệp định RCEP.",
+      "url": "https://thuvienphapluat.vn/",
+      "nguon": "thuvienphapluat.vn",
+      "tags": ["C/O", "RCEP", "quy tắc xuất xứ"]
+    },
+    {
+      "id": "doc_075",
+      "so_hieu": "11/2020/TT-BCT",
+      "tieu_de": "Thông tư quy định Quy tắc xuất xứ hàng hóa trong Hiệp định Thương mại tự do Việt Nam - EU (EVFTA)",
+      "loai_van_ban": "Thông tư",
+      "co_quan_ban_hanh": "Bộ Công Thương",
+      "ngay_ban_hanh": "2020-06-15",
+      "ngay_hieu_luc": "2020-08-01",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Thương mại quốc tế",
+      "tom_tat": "Cơ chế chứng nhận xuất xứ EVFTA, chứng từ chứng nhận xuất xứ (C/O form EUR.1), chứng từ tự chứng nhận xuất xứ, quy định gửi hàng qua nước thứ ba.",
+      "url": "https://thuvienphapluat.vn/",
+      "nguon": "thuvienphapluat.vn",
+      "tags": ["C/O", "EVFTA", "EUR.1", "tự chứng nhận xuất xứ"]
     }
   ]
 }
