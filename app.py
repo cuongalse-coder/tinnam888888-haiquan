@@ -1306,7 +1306,8 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             
     if "quota" in last_error.lower() or "429" in last_error:
         return f"⚠️ **Hệ thống đã thử toàn bộ API Keys nhưng đều đã Quá tải hoặc Hết lượt AI miễn phí!**\n\n*(Lưu ý: Bạn có thể nhập nhiều API Key cùng lúc, cách nhau bằng dấu phẩy `,`)*\n\nGoogle giới hạn tài khoản miễn phí ở 2 mức:\n1. **Giới hạn tốc độ (15 câu / phút):** Bạn đang hỏi quá nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.\n2. **Giới hạn ngày (1500 câu / ngày):** Vui lòng [vào đây](https://aistudio.google.com/app/apikey) bằng tài khoản Gmail khác để lấy Key mới và dán nối tiếp vào phần cài đặt theo dạng `KEY1, KEY2, KEY3`.\n\n**🔍 CHI TIẾT LỖI GỐC CỦA GOOGLE:**\n`{last_error}`"
-        
+    else:
+        return f"Lỗi khi kết nối với AI Trợ lý: {last_error}. Vui lòng kiểm tra lại cấu hình API Key."
 
 
 # ============================================
