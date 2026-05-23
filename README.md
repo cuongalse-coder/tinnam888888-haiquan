@@ -1,68 +1,85 @@
-# Cổng Pháp Luật Hải Quan Việt Nam ⚖️
+# 🏛️ Hệ Thống Tra Cứu Văn Bản Pháp Luật
 
-Hệ thống tra cứu văn bản pháp luật về Hải quan & Xuất nhập khẩu.
+> **Hải Quan · Kế Toán · Xuất Nhập Khẩu · Thuế · Incoterms**
 
-**URL:** [tinnam888888_haiquan.streamlit.app](https://tinnam888888_haiquan.streamlit.app)
+Ứng dụng Streamlit chuyên nghiệp để tra cứu văn bản pháp luật Việt Nam, tự động cập nhật từ các nguồn chính thức.
 
-## 🚀 Tính năng chính
+## ✨ Tính năng
 
-- 🔍 **Tìm kiếm thông minh** - Gõ câu hỏi tự nhiên, VD: "tạm nhập tái xuất có bị nộp thuế không"
-- 🔴 **Bôi đỏ** phần text khớp với từ khóa tìm kiếm
-- 📋 **Trả lời câu hỏi** - Tự động liệt kê Điều, Luật, Thông tư liên quan
-- 📂 **37+ văn bản pháp luật** - Luật, Nghị định, Thông tư, Công văn, Quyết định
-- 💾 **Tải xuống** văn bản dưới dạng file .txt
-- 📱 **Responsive** - Hoạt động tốt trên mọi thiết bị (WiFi & 4G)
+- 🔍 **Tra cứu thông minh** - Full-text search + fuzzy matching (RapidFuzz)
+- 📊 **Thống kê trực quan** - Plotly charts phân tích đa chiều
+- 🌍 **Incoterms 2020** - Đầy đủ 11 điều kiện thương mại quốc tế
+- 💰 **Biểu thuế XNK** - FTA, TTĐB, GTGT, thuế suất ưu đãi
+- 📋 **Mã HS** - Cấu trúc 97 chương biểu thuế Việt Nam
+- 📥 **Export** - Xuất CSV/JSON
+- 🔄 **Auto-update** - GitHub Actions cập nhật mỗi 6 giờ
 
-## 📂 Cấu trúc Folders lưu file
+## 📚 Phạm vi bao phủ
 
-| Folder | Loại văn bản |
-|--------|-------------|
-| A | Thông tư |
-| B | Nghị định |
-| C | Nghị quyết |
-| D | Luật |
-| E | Công văn & Quyết định |
+| Lĩnh vực | Nội dung |
+|-----------|----------|
+| 🛃 Hải quan | Thủ tục, giám sát, thông quan, AEO |
+| 📊 Kế toán | VAS, IFRS, hóa đơn, BCTC, kiểm toán |
+| 🚢 XNK | Thủ tục XNK, logistics, C/O, HS |
+| 💰 Thuế | GTGT, TNDN, TNCN, XNK, TTĐB |
+| 🌍 TMQT | FTA (CPTPP, RCEP, EVFTA), Incoterms |
+| 🏢 Doanh nghiệp | Đăng ký, giấy phép, đầu tư |
+| 👷 Lao động | Lương, BHXH, lao động nước ngoài |
 
-## 🛠️ Cài đặt & Chạy
+## 🚀 Cài đặt & Chạy
 
-### Chạy local:
 ```bash
+# Clone repo
+git clone https://github.com/YOUR_USERNAME/haiquan-app.git
+cd haiquan-app
+
+# Cài đặt dependencies
 pip install -r requirements.txt
+
+# Chạy app
 streamlit run app.py
 ```
 
-### Deploy lên Streamlit Cloud:
-1. Push code lên GitHub repository
-2. Vào [share.streamlit.io](https://share.streamlit.io)
-3. Kết nối GitHub repo
-4. Đặt tên app: `tinnam888888_haiquan`
-5. Main file: `app.py`
-6. Click Deploy!
+## 🔄 Tự động cập nhật
 
-## 📝 Hướng dẫn Deploy chi tiết
+Dữ liệu được cập nhật tự động qua GitHub Actions:
+- **Tần suất:** Mỗi 6 giờ (0h, 6h, 12h, 18h UTC)
+- **Nguồn:** customs.gov.vn, thuvienphapluat.vn, vbpl.vn
+- **Cơ chế:** Scrape → Merge → Deduplicate → Git Push → Auto-deploy
 
-### Bước 1: Tạo GitHub Repository
-1. Vào [github.com](https://github.com) → đăng nhập/đăng ký
-2. Click **"New repository"**
-3. Đặt tên: `customs-law-portal`
-4. Chọn **Public**
-5. Click **Create repository**
+## 📁 Cấu trúc dự án
 
-### Bước 2: Upload code
-Upload các file sau lên GitHub:
-- `app.py`
-- `requirements.txt`
-- `.streamlit/config.toml`
-- `data/legal-documents.json`
+```
+haiquan-app/
+├── app.py                    # Main Streamlit app
+├── requirements.txt          # Dependencies
+├── .streamlit/config.toml    # Theme configuration
+├── assets/style.css          # Custom CSS
+├── utils/
+│   ├── scraper.py            # Web scraping engine
+│   ├── data_manager.py       # Data management + Incoterms
+│   └── search_engine.py      # Full-text search + fuzzy
+├── scripts/fetch_data.py     # Auto-update script
+├── data/documents.json       # Document database
+└── .github/workflows/        # GitHub Actions
+```
 
-### Bước 3: Deploy trên Streamlit Cloud
-1. Vào [share.streamlit.io](https://share.streamlit.io)
-2. Đăng nhập bằng GitHub
-3. Click **"New app"**
-4. Chọn repository vừa tạo
-5. Branch: `main`
-6. Main file path: `app.py`
-7. App URL: `tinnam888888_haiquan`
-8. Click **"Deploy!"**
+## 🛠️ Tech Stack
 
-Sau 2-3 phút, app sẽ live tại: **tinnam888888_haiquan.streamlit.app** 🎉
+- **Frontend:** Streamlit + Custom CSS (Glassmorphism)
+- **Charts:** Plotly
+- **Search:** RapidFuzz (fuzzy matching)
+- **Scraping:** BeautifulSoup + lxml
+- **CI/CD:** GitHub Actions
+- **Hosting:** Streamlit Cloud
+
+## ⚠️ Disclaimer
+
+Hệ thống này chỉ mang tính chất **tham khảo**. Vui lòng đối chiếu với nguồn chính thức:
+- [customs.gov.vn](https://customs.gov.vn) - Tổng cục Hải quan
+- [vbpl.vn](https://vbpl.vn) - CSDL VBPL quốc gia
+- [thuvienphapluat.vn](https://thuvienphapluat.vn) - Thư viện Pháp luật
+
+## 📄 License
+
+MIT License
