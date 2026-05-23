@@ -1209,7 +1209,7 @@ def call_gemini_api(query, context_docs, api_key, domain):
     
     prompt = f"""Bạn là {role_desc}
 THỜI GIAN THỰC TẾ HIỆN TẠI CỦA HỆ THỐNG: {current_time_str}. 
-MỆNH LỆNH TỐI CAO: Bạn BẮT BUỘC phải tra cứu Internet để lấy các văn bản được cập nhật sát nhất tính đến đúng thời điểm {current_time_str} này, tuyệt đối không được bỏ sót tài liệu mới nào! TUYỆT ĐỐI KHÔNG DÙNG DỮ LIỆU HUẤN LUYỆN CŨ CỦA BẠN.
+MỆNH LỆNH TỐI CAO: Bạn BẮT BUỘC phải tra cứu Internet để lấy các văn bản được cập nhật sát nhất tính đến đúng thời điểm {current_time_str} này, tuyệt đối không được bỏ sót tài liệu mới nào! TUYỆT ĐỐI KHÔNG DÙNG DỮ LIỆU HUẤN LUỆN CŨ CỦA BẠN.
 Nhiệm vụ của bạn là trả lời câu hỏi của người dùng THẬT CHÍNH XÁC TUYỆT ĐỐI VÀ ĐÚNG TRỌNG TÂM CÂU HỎI. 
 {special_instructions}
 1. ĐẦU TIÊN VÀ DUY NHẤT, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín trên internet toàn cầu (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật.
@@ -1236,18 +1236,21 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             genai.configure(api_key=current_key)
             try:
                 # Kích hoạt công cụ tra cứu Google Search (hỗ trợ gemini-1.5-flash)
-                model = genai.GenerativeModel('gemini-1.5-flash', tools='google_search_retrieval')
+                model = genai.GenerativeModel('gemini-1.5-pro', tools='google_search_retrieval')
                 response = model.generate_content(prompt)
+                text = response.text
             except Exception:
                 try:
                     # Fallback cách cũ nếu SDK không hỗ trợ truyền string 'google_search_retrieval'
                     model = genai.GenerativeModel('gemini-1.5-flash')
                     response = model.generate_content(prompt)
+                    text = response.text
                 except Exception:
-                    model = genai.GenerativeModel('gemini-flash-latest')
+                    model = genai.GenerativeModel('gemini-1.5-pro')
                     response = model.generate_content(prompt)
+                    text = response.text
             stats["api_calls"] += 1
-            return response.text
+            return text
         except Exception as e:
             error_msg = str(e)
             if "429" in error_msg or "quota" in error_msg.lower():
