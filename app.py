@@ -1262,40 +1262,12 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             last_error = str(e)
             continue
 
-    # Giai đoạn 3: Ổn định (Gemini 1.5 Pro + Search) - Khắc phục lỗi limit 0
+    # Giai đoạn 3: Ổn định cuối cùng (Gemini 2.0 Flash) - Không dùng Search
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-1.5-pro', tools='google_search_retrieval')
-            response = model.generate_content(prompt)
-            text = response.text
-            stats["api_calls"] += 1
-            return text
-        except Exception as e:
-            last_error = str(e)
-            continue
-            
-    # Giai đoạn 4: Ổn định & Nhanh (Gemini 1.5 Flash + Search)
-    for current_key in api_keys:
-        if not current_key: continue
-        try:
-            genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-1.5-flash', tools='google_search_retrieval')
-            response = model.generate_content(prompt)
-            text = response.text
-            stats["api_calls"] += 1
-            return text
-        except Exception as e:
-            last_error = str(e)
-            continue
-            
-    # Giai đoạn 5: Lớp bảo vệ cuối cùng (Gemini 1.5 Flash KHÔNG Search) - Bất tử
-    for current_key in api_keys:
-        if not current_key: continue
-        try:
-            genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             response = model.generate_content(prompt)
             text = response.text
             stats["api_calls"] += 1
