@@ -8,7 +8,11 @@ import streamlit as st
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+def get_vn_time():
+    return datetime.now(timezone.utc) + timedelta(hours=7)
+
 from pathlib import Path
 from unidecode import unidecode
 from thefuzz import fuzz
@@ -451,7 +455,7 @@ def fetch_live_data(domain):
                         "number": doc_number,
                         "title": entry.title,
                         "summary": getattr(entry, 'description', 'Cập nhật tự động từ nguồn ' + source_name),
-                        "issueDate": datetime.now().strftime('%Y-%m-%d'),
+                        "issueDate": get_vn_time().strftime('%Y-%m-%d'),
                         "effectiveDate": "Đang cập nhật",
                         "issuingBody": f"Nguồn: {source_name}",
                         "status": "active",
@@ -560,7 +564,7 @@ def get_system_stats():
     from datetime import datetime
     return {
         "active_sessions": {},
-        "api_date": datetime.now().date(),
+        "api_date": get_vn_time().date(),
         "api_calls": 0,
         "api_limit": 1500,
         "total_visitors": 18243
@@ -965,7 +969,7 @@ def render_header(domain):
     </div>
     <div style="background: linear-gradient(90deg, #10b981 0%, #059669 100%); padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
         <span style="color: white; font-weight: bold; font-size: 1.1rem;">
-            🔄 HỆ THỐNG AUTO-UPDATE (VER 2.0) ĐÃ CẬP NHẬT DỮ LIỆU LÚC: {datetime.now().strftime('%H:%M - %d/%m/%Y')} (Giờ VN)
+            🔄 HỆ THỐNG AUTO-UPDATE (VER 2.0) ĐÃ CẬP NHẬT DỮ LIỆU LÚC: {get_vn_time().strftime('%H:%M - %d/%m/%Y')} (Giờ VN)
         </span>
     </div>
     """, unsafe_allow_html=True)
@@ -1205,7 +1209,7 @@ def call_gemini_api(query, context_docs, api_key, domain):
 - BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt theo dạng danh sách gạch đầu dòng (Bullet points). TUYỆT ĐỐI KHÔNG SỬ DỤNG BẢNG (TABLE) VÌ SẼ BỊ LỖI HIỂN THỊ."""
 
     from datetime import datetime
-    current_time_str = datetime.now().strftime('%H:%M:%S ngày %d/%m/%Y')
+    current_time_str = get_vn_time().strftime('%H:%M:%S ngày %d/%m/%Y')
     
     prompt = f"""Bạn là {role_desc}
 THỜI GIAN THỰC TẾ HIỆN TẠI CỦA HỆ THỐNG: {current_time_str}. 
@@ -1225,8 +1229,8 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
     api_keys = [k.strip() for k in api_key.split(',')] if ',' in api_key else [api_key.strip()]
     stats = get_system_stats()
     from datetime import datetime
-    if stats["api_date"] != datetime.now().date():
-        stats["api_date"] = datetime.now().date()
+    if stats["api_date"] != get_vn_time().date():
+        stats["api_date"] = get_vn_time().date()
         stats["api_calls"] = 0
         
     last_error = ""
@@ -1372,8 +1376,8 @@ def main():
         stats["active_sessions"] = active
         
         from datetime import datetime
-        if stats["api_date"] != datetime.now().date():
-            stats["api_date"] = datetime.now().date()
+        if stats["api_date"] != get_vn_time().date():
+            stats["api_date"] = get_vn_time().date()
             stats["api_calls"] = 0
             
         active_users = len(stats["active_sessions"])
