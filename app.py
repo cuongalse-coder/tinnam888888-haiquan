@@ -1230,35 +1230,50 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_calls"] = 0
         
     last_error = ""
+    # Giai đoạn 1: Vắt kiệt bản PRO trên TẤT CẢ các Key
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            try:
-                # Dùng model mạnh nhất hiện tại là gemini-2.5-pro
-                model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search_retrieval')
-                response = model.generate_content(prompt)
-                text = response.text
-            except Exception:
-                try:
-                    # Fallback sang bản flash nếu bản pro lỗi hoặc quá tải
-                    model = genai.GenerativeModel('gemini-2.5-flash')
-                    response = model.generate_content(prompt)
-                    text = response.text
-                except Exception:
-                    # Fallback lớp 3 xuống 2.0 hoặc 1.5 pro
-                    model = genai.GenerativeModel('gemini-2.0-flash')
-                    response = model.generate_content(prompt)
-                    text = response.text
+            model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            text = response.text
             stats["api_calls"] += 1
             return text
         except Exception as e:
-            error_msg = str(e)
-            if "429" in error_msg or "quota" in error_msg.lower():
+            last_error = str(e)
+            # Trượt sang Key tiếp theo thay vì xuống model thấp hơn
+            continue
+            
+    # Giai đoạn 2: Nếu 100% Key đều hết Quota Pro (hoặc lỗi tool), kích hoạt bản FLASH trên toàn bộ Key
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            response = model.generate_content(prompt)
+            text = response.text
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+            
+    # Giai đoạn 3: Lớp bảo vệ cuối cùng
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.0-flash')
+            response = model.generate_content(prompt)
+            text = response.text
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            if "quota" in str(e).lower() or "429" in str(e):
                 last_error = "quota"
-                continue
-            else:
-                return f"Lỗi khi kết nối với AI Trợ lý: {e}. Vui lòng kiểm tra lại cấu hình API Key."
+            continue
 
     if last_error == "quota":
         return "⚠️ **Hệ thống đã thử toàn bộ API Keys nhưng đều đã Quá tải hoặc Hết lượt AI miễn phí!**\n\n*(Lưu ý: Bạn có thể nhập nhiều API Key cùng lúc, cách nhau bằng dấu phẩy `,`)*\n\nGoogle giới hạn tài khoản miễn phí ở 2 mức:\n1. **Giới hạn tốc độ (15 câu / phút):** Bạn đang hỏi quá nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.\n2. **Giới hạn ngày (1500 câu / ngày):** Vui lòng [vào đây](https://aistudio.google.com/app/apikey) bằng tài khoản Gmail khác để lấy Key mới và dán nối tiếp vào phần cài đặt theo dạng `KEY1, KEY2, KEY3`."
