@@ -72,27 +72,28 @@ def scrape_mof():
     # Khi cấu trúc HTML web nguồn ổn định, phần này sẽ được thay bằng dữ liệu bóc tách từ soup
     today_str = datetime.now().strftime("%Y-%m-%d")
     
-    # Chỉ tạo ra văn bản giả lập nếu hệ thống chưa có để minh họa
-    mock_doc = {
-        "id": f"tt-test-{current_year}",
-        "type": "thong-tu",
-        "typeName": "Thông tư",
-        "number": f"99/{current_year}/TT-BTC",
-        "title": f"Thông tư hướng dẫn mới nhất về Kế toán năm {current_year}",
-        "issueDate": today_str,
-        "effectiveDate": today_str,
-        "issuingBody": "Bộ Tài chính",
-        "summary": "Văn bản tự động lấy từ nguồn để cập nhật theo thời gian thực.",
-        "purpose": "Đảm bảo hệ thống luôn có luật mới.",
-        "keyPoints": ["Quy định mới cập nhật", "Tự động hóa"],
-        "articles": [],
-        "content": "Nội dung văn bản được hệ thống tự động tải về...",
-        "status": "active",
-        "folder": "A",
-        "tags": ["kế toán", "tự động", f"năm {current_year}"],
-        "relatedDocs": []
-    }
-    new_docs.append(mock_doc)
+    # Tạo 3 văn bản giả lập để test
+    for i in range(1, 4):
+        mock_doc = {
+            "id": f"tt-test-demo-{current_year}-00{i}",
+            "type": "thong-tu" if i % 2 == 0 else "cong-van",
+            "typeName": "Thông tư" if i % 2 == 0 else "Công văn",
+            "number": f"99{i}/{current_year}/TT-BTC",
+            "title": f"Văn bản tự động lấy từ Bộ Tài Chính (Test Auto-Update số {i})",
+            "issueDate": today_str,
+            "effectiveDate": today_str,
+            "issuingBody": "Bộ Tài chính",
+            "summary": "Văn bản này được sinh ra tự động để kiểm thử cơ chế cào dữ liệu lúc nửa đêm.",
+            "purpose": "Đảm bảo hệ thống luôn có luật mới.",
+            "keyPoints": ["Quy định mới cập nhật", "Tự động hóa", f"Bản test số {i}"],
+            "articles": [],
+            "content": f"Nội dung văn bản số {i} được hệ thống Robot tự động cào về từ mạng Internet...",
+            "status": "active",
+            "folder": "A",
+            "tags": ["test", "tự động", f"năm {current_year}"],
+            "relatedDocs": []
+        }
+        new_docs.append(mock_doc)
     return new_docs
 
 def update_status_old_documents(data):
