@@ -1,6 +1,6 @@
 """
-C沼봏G PH횁P LU梳촖 H梳줚 QUAN VI沼냊 NAM
-Tra c沼쯷 Th척ng t튼 - Ngh沼?휃沼땙h - Ngh沼?quy梳퓍 - Lu梳춗 - C척ng v훱n - Quy梳퓍 휃沼땙h
+CỔNG PHÁP LUẬT HẢI QUAN VIỆT NAM
+Tra cứu Thông tư - Nghị định - Nghị quyết - Luật - Công văn - Quyết định
 URL: tinnam888888_haiquan.streamlit.app
 """
 
@@ -21,16 +21,53 @@ except ImportError:
 # PAGE CONFIG
 # ============================================
 st.set_page_config(
-    page_title="C沼븂g Ph찼p Lu梳춗 H梳즜 Quan Vi沼뇍 Nam - Tra c沼쯷 Th척ng t튼, Ngh沼?휃沼땙h, Lu梳춗 XNK",
-    page_icon="?뽳툘",
+    page_title="Cổng Pháp Luật Hải Quan Việt Nam - Tra cứu Thông tư, Nghị định, Luật XNK",
+    page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={
-        'About': "## ?뽳툘 C沼븂g Ph찼p Lu梳춗 H梳즜 Quan Vi沼뇍 Nam\n"
-                 "H沼?th沼몁g tra c沼쯷 v훱n b梳즢 ph찼p lu梳춗 v沼?H梳즜 quan & Xu梳쩿 nh梳춑 kh梳쯷.\n\n"
-                 "**Li챗n h沼?** tinnam888888_haiquan.streamlit.app"
+        'About': "## ⚖️ Cổng Pháp Luật Hải Quan Việt Nam\n"
+                 "Hệ thống tra cứu văn bản pháp luật về Hải quan & Xuất nhập khẩu.\n\n"
+                 "**Liên hệ:** tinnam888888_haiquan.streamlit.app"
     }
 )
+
+# ============================================
+# BẢO MẬT - KIỂM TRA MẬT KHẨU NGAY TỪ ĐẦU
+# ============================================
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown("""
+    <style>
+    .block-container { max-width: 500px !important; margin: auto; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif !important; }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style='text-align: center; padding: 60px 20px 20px;'>
+        <div style='font-size: 4rem;'>🔐</div>
+        <h2 style='color: #e2e8f0; margin-top: 1rem;'>CỔNG PHÁP LUẬT HẢI QUAN</h2>
+        <p style='color: #94a3b8;'>Nhập mật khẩu để truy cập hệ thống</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        password = st.text_input("🔑 Mật khẩu", type="password", placeholder="Nhập mật khẩu...", key="login_pw")
+        login_btn = st.button("🚀 Đăng nhập", use_container_width=True, type="primary")
+        
+        if login_btn:
+            if password == "1991":
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("❌ Sai mật khẩu! Vui lòng thử lại.")
+    
+    st.stop()
 
 # ============================================
 # CUSTOM CSS
@@ -89,7 +126,7 @@ st.markdown("""
     z-index: 1;
 }
 
-/* ===== SEARCH HIGHLIGHT (B횚I 휂沼? ===== */
+/* ===== SEARCH HIGHLIGHT (BÔI ĐỎ) ===== */
 .search-match {
     background-color: #ef4444 !important;
     color: #fff !important;
@@ -341,7 +378,6 @@ def load_documents():
         with open(data_path, "r", encoding="utf-8") as f:
             data = json.load(f)
             docs = data.get("documents", [])
-            
             type_mapping = {
                 "Thông tư": "thong-tu",
                 "Nghị định": "nghi-dinh",
@@ -350,7 +386,6 @@ def load_documents():
                 "Công văn": "cong-van",
                 "Quyết định": "quyet-dinh"
             }
-            
             mapped_docs = []
             for d in docs:
                 t = d.get("loai_van_ban", "")
@@ -402,17 +437,17 @@ TYPE_BADGES = {
 }
 
 TYPE_ICONS = {
-    "thong-tu": "📄",
-    "nghi-dinh": "📜",
-    "nghi-quyet": "📝",
-    "luat": "⚖️",
-    "cong-van": "✉️",
-    "quyet-dinh": "🎯",
+    "thong-tu": "📘",
+    "nghi-dinh": "📗",
+    "nghi-quyet": "📕",
+    "luat": "📙",
+    "cong-van": "📄",
+    "quyet-dinh": "📋",
 }
 
 STATUS_NAMES = {
     "active": "Còn hiệu lực",
-    "amended": "Sửa đổi",
+    "amended": "Đã sửa đổi",
     "expired": "Hết hiệu lực",
 }
 
@@ -432,14 +467,15 @@ FOLDER_MAP = {
 }
 
 STOP_WORDS = {
-    'cơ', 'không', 'nào', 'là', 'với', 'của', 'cho', 'và', 'hay', 'hoặc',
-    'bị', 'được', 'theo', 'từ', 'trong', 'những', 'các', 'một', 'này',
-    'đó', 'thì', 'mà', 'để', 'về', 'tới', 'đến', 'khi', 'nếu', 'do',
-    'vậy', 'bằng', 'qua', 'trên', 'dưới', 'ra', 'vào', 'lên', 'xuống',
-    'lại', 'đi', 'hên', 'như', 'rất', 'quá', 'cũng', 'đã', 'đang',
+    'có', 'không', 'nào', 'là', 'về', 'của', 'cho', 'và', 'hay', 'hoặc',
+    'bị', 'được', 'theo', 'tại', 'trong', 'những', 'các', 'một', 'này',
+    'đó', 'thì', 'mà', 'để', 'với', 'từ', 'đến', 'khi', 'nếu', 'do',
+    'vì', 'bằng', 'qua', 'trên', 'dưới', 'ra', 'vào', 'lên', 'xuống',
+    'lại', 'đi', 'hơn', 'nhất', 'rất', 'quá', 'cũng', 'đã', 'đang',
     'sẽ', 'chưa', 'còn', 'ai', 'gì', 'đâu', 'sao', 'nên', 'phải',
-    'có', 'muốn', 'biết', 'hiểu', 'xin', 'hãy', 'cho', 'tôi', 'mình',
-    'nhà', 'năm', 'tháng', 'ngày', 'nội', 'dung', 'quy', 'định',
+    'cần', 'muốn', 'biết', 'hiểu', 'xin', 'hỏi', 'cho', 'tôi', 'mình',
+    'ạ', 'nhé', 'nhỉ', 'vậy', 'thế', 'như', 'nữa', 'đều',
+    'mọi', 'hết', 'toàn', 'bộ', 'riêng', 'chung', 'khác', 'giống',
 }
 
 DOC_TYPE_MAP = {
@@ -465,7 +501,7 @@ def is_question(query: str) -> bool:
     if '?' in query:
         return True
     patterns = [
-        r'cơ.*không', r'là gì', r'bao nhiêu', r'thế nào', r'như thế nào',
+        r'có.*không', r'là gì', r'bao nhiêu', r'thế nào', r'như thế nào',
         r'làm sao', r'tại sao', r'vì sao', r'ở đâu', r'khi nào', r'bao giờ',
         r'theo.*nào', r'quy định.*gì', r'hướng dẫn.*gì', r'áp dụng.*nào',
     ]
@@ -508,9 +544,9 @@ def parse_query(query: str) -> dict:
         q = q.replace(year_match.group(0), '').strip()
 
     # Detect sort
-    if re.search(r'mới nhất|gần đây|latest', q):
+    if re.search(r'mới\s*nhất|gần\s*đây|latest', q):
         result['sort_by'] = 'newest'
-        q = re.sub(r'mới nhất|gần đây|latest', '', q).strip()
+        q = re.sub(r'mới\s*nhất|gần\s*đây|latest', '', q).strip()
 
     # Extract keywords (remove stop words)
     tokens = [w for w in q.split() if len(w) > 1]
@@ -619,7 +655,6 @@ def internet_search(query: str, max_results=3) -> list:
         return []
     try:
         ddgs = DDGS()
-        # Focus on reputable Vietnam legal sites
         search_query = f"{query} site:thuvienphapluat.vn OR site:customs.gov.vn OR site:luatvietnam.vn OR site:chinhphu.vn OR site:moj.gov.vn OR site:moit.gov.vn OR site:baohaiquan.vn"
         results = list(ddgs.text(search_query, region='vn-vi', max_results=max_results))
         return results
@@ -627,10 +662,11 @@ def internet_search(query: str, max_results=3) -> list:
         print(f"Internet search error: {e}")
         return []
 
+
 def generate_answer(query: str, results: list, keywords: list) -> str:
     """Generate a structured answer panel for question queries with live internet search."""
     internet_results = internet_search(query, max_results=3)
-    
+
     if not results and not internet_results:
         return ""
 
@@ -668,7 +704,7 @@ def generate_answer(query: str, results: list, keywords: list) -> str:
             html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
             html += f'Theo <span class="type-badge {badge_class}">{type_name}</span> '
             html += f'<strong style="color: #FAFAFA;">{doc.get("number", "")}</strong>'
-
+            
             issue_date = doc.get('issueDate', '')
             if issue_date:
                 try:
@@ -676,10 +712,8 @@ def generate_answer(query: str, results: list, keywords: list) -> str:
                     html += f' ({dt.strftime("%d/%m/%Y")})'
                 except:
                     pass
-
             html += ':</div>'
 
-            # Show relevant key points
             key_points = doc.get('keyPoints', [])
             if key_points:
                 html += '<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">'
@@ -688,7 +722,6 @@ def generate_answer(query: str, results: list, keywords: list) -> str:
                     html += f'💡 {highlighted}<br>'
                 html += '</div>'
 
-            # Show relevant articles
             articles = doc.get('articles', [])
             if articles:
                 html += '<div class="answer-item-content" style="margin-top:0.5rem;">'
@@ -698,7 +731,6 @@ def generate_answer(query: str, results: list, keywords: list) -> str:
                     highlighted_content = highlight_text(art_content, keywords)
                     html += f'<strong style="color:#fbbf24;">{art_title}</strong>: {highlighted_content}<br><br>'
                 html += '</div>'
-
             html += '</div>'
 
     html += '<div style="text-align: right; margin-top: 1.5rem;">'
@@ -713,28 +745,28 @@ def format_doc_for_download(doc: dict) -> str:
     lines = [
         '=' * 80,
         type_name,
-        f'S沼? {doc.get("number", "")}',
+        f'Số: {doc.get("number", "")}',
         '=' * 80,
         '',
-        f'TI횎U 휂沼: {doc.get("title", "")}',
+        f'TIÊU ĐỀ: {doc.get("title", "")}',
         '',
-        f'Ng횪y ban h횪nh: {doc.get("issueDate", "N/A")}',
-        f'Ng횪y hi沼뇎 l沼켧: {doc.get("effectiveDate", "N/A")}',
-        f'C퉤 quan ban h횪nh: {doc.get("issuingBody", "N/A")}',
-        f'Tr梳죒g th찼i: {STATUS_NAMES.get(doc.get("status", ""), "N/A")}',
+        f'Ngày ban hành: {doc.get("issueDate", "N/A")}',
+        f'Ngày hiệu lực: {doc.get("effectiveDate", "N/A")}',
+        f'Cơ quan ban hành: {doc.get("issuingBody", "N/A")}',
+        f'Trạng thái: {STATUS_NAMES.get(doc.get("status", ""), "N/A")}',
         '',
         '-' * 80,
-        'T횙M T梳췛 N沼쁈 DUNG:',
+        'TÓM TẮT NỘI DUNG:',
         '-' * 80,
         doc.get('summary', ''),
         '',
         '-' * 80,
-        'M沼짡 휂횒CH BAN H?NH:',
+        'MỤC ĐÍCH BAN HÀNH:',
         '-' * 80,
         doc.get('purpose', ''),
         '',
         '-' * 80,
-        'N沼쁈 DUNG CH횒NH:',
+        'NỘI DUNG CHÍNH:',
         '-' * 80,
     ]
 
@@ -742,7 +774,7 @@ def format_doc_for_download(doc: dict) -> str:
         lines.append(f'{i}. {point}')
 
     if doc.get('articles'):
-        lines.extend(['', '-' * 80, 'C횁C 휂I沼U KHO梳줟 QUAN TR沼똍G:', '-' * 80])
+        lines.extend(['', '-' * 80, 'CÁC ĐIỀU KHOẢN QUAN TRỌNG:', '-' * 80])
         for art in doc['articles']:
             num = art.get('number', '')
             title = art.get('title', '')
@@ -751,12 +783,12 @@ def format_doc_for_download(doc: dict) -> str:
 
     lines.extend([
         '', '=' * 80,
-        'N沼쁈 DUNG 휂梳쫃 휂沼?',
+        'NỘI DUNG ĐẦY ĐỦ:',
         '=' * 80,
         doc.get('content', ''),
         '', '=' * 80,
         f'Tags: {", ".join(doc.get("tags", []))}',
-        f'V훱n b梳즢 li챗n quan: {", ".join(doc.get("relatedDocs", []))}',
+        f'Văn bản liên quan: {", ".join(doc.get("relatedDocs", []))}',
         '=' * 80,
     ])
 
@@ -769,8 +801,8 @@ def format_doc_for_download(doc: dict) -> str:
 def render_header():
     st.markdown("""
     <div class="main-header">
-        <h1>?뽳툘 C沼봏G PH횁P LU梳촖 H梳줚 QUAN VI沼냊 NAM</h1>
-        <p>Tra c沼쯷 Th척ng t튼 ??Ngh沼?휃沼땙h ??Ngh沼?quy梳퓍 ??Lu梳춗 ??C척ng v훱n ??Quy梳퓍 휃沼땙h</p>
+        <h1>⚖️ CỔNG PHÁP LUẬT HẢI QUAN VIỆT NAM</h1>
+        <p>Tra cứu Thông tư • Nghị định • Nghị quyết • Luật • Công văn • Quyết định</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -783,13 +815,13 @@ def render_stats(documents):
 
     cols = st.columns(7)
     stats = [
-        ("?뱴", len(documents), "T沼븂g v훱n b梳즢", "all"),
-        ("?뱲", type_counts.get('thong-tu', 0), "Th척ng t튼", "thong-tu"),
-        ("?뱱", type_counts.get('nghi-dinh', 0), "Ngh沼?휃沼땙h", "nghi-dinh"),
-        ("?뱯", type_counts.get('nghi-quyet', 0), "Ngh沼?quy梳퓍", "nghi-quyet"),
-        ("?뱳", type_counts.get('luat', 0), "Lu梳춗", "luat"),
-        ("?뱞", type_counts.get('cong-van', 0), "C척ng v훱n", "cong-van"),
-        ("?뱥", type_counts.get('quyet-dinh', 0), "Quy梳퓍 휃沼땙h", "quyet-dinh"),
+        ("📚", len(documents), "Tổng văn bản", "all"),
+        ("📘", type_counts.get('thong-tu', 0), "Thông tư", "thong-tu"),
+        ("📗", type_counts.get('nghi-dinh', 0), "Nghị định", "nghi-dinh"),
+        ("📕", type_counts.get('nghi-quyet', 0), "Nghị quyết", "nghi-quyet"),
+        ("📙", type_counts.get('luat', 0), "Luật", "luat"),
+        ("📄", type_counts.get('cong-van', 0), "Công văn", "cong-van"),
+        ("📋", type_counts.get('quyet-dinh', 0), "Quyết định", "quyet-dinh"),
     ]
 
     for col, (icon, count, label, _) in zip(cols, stats):
@@ -836,7 +868,7 @@ def render_doc_card(doc, keywords=None):
         </div>
         <div class="doc-card-number">{doc.get('number', '')}</div>
         <div class="doc-card-title">{title}</div>
-        <div class="doc-card-meta">?뱟 {formatted_date} ??{doc.get('issuingBody', '')}</div>
+        <div class="doc-card-meta">📅 {formatted_date} • {doc.get('issuingBody', '')}</div>
         <div class="doc-card-summary">{summary}...</div>
     </div>
     """, unsafe_allow_html=True)
@@ -847,7 +879,7 @@ def render_doc_detail(doc, keywords=None):
     doc_type = doc.get('type', '')
     badge_class = TYPE_BADGES.get(doc_type, '')
     type_name = TYPE_NAMES.get(doc_type, doc_type)
-    type_icon = TYPE_ICONS.get(doc_type, '?뱞')
+    type_icon = TYPE_ICONS.get(doc_type, '📄')
     status = doc.get('status', 'active')
     status_name = STATUS_NAMES.get(status, status)
     folder = FOLDER_MAP.get(doc_type, 'E')
@@ -875,19 +907,19 @@ def render_doc_detail(doc, keywords=None):
         if issue_date:
             try:
                 dt = datetime.strptime(issue_date, '%Y-%m-%d')
-                st.markdown(f"?뱟 **Ng횪y ban h횪nh:** {dt.strftime('%d/%m/%Y')}")
+                st.markdown(f"📅 **Ngày ban hành:** {dt.strftime('%d/%m/%Y')}")
             except:
-                st.markdown(f"?뱟 **Ng횪y ban h횪nh:** {issue_date}")
+                st.markdown(f"📅 **Ngày ban hành:** {issue_date}")
     with col2:
         eff_date = doc.get('effectiveDate', '')
         if eff_date:
             try:
                 dt = datetime.strptime(eff_date, '%Y-%m-%d')
-                st.markdown(f"?뱠 **Ng횪y hi沼뇎 l沼켧:** {dt.strftime('%d/%m/%Y')}")
+                st.markdown(f"📆 **Ngày hiệu lực:** {dt.strftime('%d/%m/%Y')}")
             except:
-                st.markdown(f"?뱠 **Ng횪y hi沼뇎 l沼켧:** {eff_date}")
+                st.markdown(f"📆 **Ngày hiệu lực:** {eff_date}")
     with col3:
-        st.markdown(f"?룢截?**C퉤 quan:** {doc.get('issuingBody', 'N/A')}")
+        st.markdown(f"🏛️ **Cơ quan:** {doc.get('issuingBody', 'N/A')}")
 
     st.divider()
 
@@ -897,7 +929,7 @@ def render_doc_detail(doc, keywords=None):
         summary = highlight_text(summary, keywords)
     st.markdown(f"""
     <div class="detail-section">
-        <h4>?뱷 T횙M T梳췛 N沼쁈 DUNG</h4>
+        <h4>📝 TÓM TẮT NỘI DUNG</h4>
         <div style="color:#e2e8f0;font-size:0.9rem;line-height:1.7;">{summary}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -909,7 +941,7 @@ def render_doc_detail(doc, keywords=None):
             purpose = highlight_text(purpose, keywords)
         st.markdown(f"""
         <div class="detail-section">
-            <h4>?렞 M沼짡 휂횒CH BAN H?NH</h4>
+            <h4>🎯 MỤC ĐÍCH BAN HÀNH</h4>
             <div style="color:#e2e8f0;font-size:0.9rem;line-height:1.7;">{purpose}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -917,7 +949,7 @@ def render_doc_detail(doc, keywords=None):
     # Key Points
     key_points = doc.get('keyPoints', [])
     if key_points:
-        points_html = '<div class="detail-section"><h4>?뱦 N沼쁈 DUNG CH횒NH</h4><ul>'
+        points_html = '<div class="detail-section"><h4>📌 NỘI DUNG CHÍNH</h4><ul>'
         for point in key_points:
             p = highlight_text(point, keywords) if keywords else point
             points_html += f'<li style="color:#e2e8f0;font-size:0.88rem;margin-bottom:0.5rem;line-height:1.5;">{p}</li>'
@@ -927,7 +959,7 @@ def render_doc_detail(doc, keywords=None):
     # Articles
     articles = doc.get('articles', [])
     if articles:
-        st.markdown('<div class="detail-section"><h4>?뱰 C횁C 휂I沼U KHO梳줟 QUAN TR沼똍G</h4></div>', unsafe_allow_html=True)
+        st.markdown('<div class="detail-section"><h4>📖 CÁC ĐIỀU KHOẢN QUAN TRỌNG</h4></div>', unsafe_allow_html=True)
         for art in articles:
             art_num = art.get('number', '')
             art_title = art.get('title', '')
@@ -936,7 +968,7 @@ def render_doc_detail(doc, keywords=None):
                 art_title = highlight_text(art_title, keywords)
                 art_content = highlight_text(art_content, keywords)
             header = f"{art_num}" + (f". {art_title}" if art_title else "")
-            with st.expander(f"?뱶 {art.get('number', '')} - {art.get('title', '')}", expanded=False):
+            with st.expander(f"📜 {art.get('number', '')} - {art.get('title', '')}", expanded=False):
                 st.markdown(f"""
                 <div class="article-content">{art_content}</div>
                 """, unsafe_allow_html=True)
@@ -944,7 +976,7 @@ def render_doc_detail(doc, keywords=None):
     # Full Content
     content = doc.get('content', '')
     if content:
-        with st.expander("?뱞 XEM N沼쁈 DUNG 휂梳쫃 휂沼?, expanded=False):
+        with st.expander("📄 XEM NỘI DUNG ĐẦY ĐỦ", expanded=False):
             if keywords:
                 content = highlight_text(content, keywords)
             st.markdown(f'<div style="color:#cbd5e1;font-size:0.88rem;line-height:1.8;white-space:pre-wrap;">{content}</div>', unsafe_allow_html=True)
@@ -957,7 +989,7 @@ def render_doc_detail(doc, keywords=None):
         safe_number = re.sub(r'[/\\?%*:|"<>]', '-', doc.get('number', 'unknown'))
         filename = f"{safe_number}.txt"
         st.download_button(
-            label=f"?뮶 T梳즜 xu沼몁g (Folder {folder})",
+            label=f"💾 Tải xuống (Folder {folder})",
             data=file_content.encode('utf-8-sig'),
             file_name=filename,
             mime='text/plain',
@@ -974,10 +1006,10 @@ def render_doc_detail(doc, keywords=None):
 def render_footer():
     st.markdown("""
     <div class="footer">
-        <p>?뽳툘 <strong>C沼븂g Ph찼p Lu梳춗 H梳즜 Quan Vi沼뇍 Nam</strong></p>
-        <p>D沼?li沼뇎 tham kh梳즣 t沼? thuvienphapluat.vn ??customs.gov.vn ??chinhphu.vn</p>
-        <p>?벁 tinnam888888_haiquan.streamlit.app</p>
-        <p style="margin-top:0.5rem;">짤 2024-2026 | C梳춑 nh梳춗 li챗n t沼쩭 c찼c v훱n b梳즢 m沼쌻 nh梳쩿</p>
+        <p>⚖️ <strong>Cổng Pháp Luật Hải Quan Việt Nam</strong></p>
+        <p>Dữ liệu tham khảo từ: thuvienphapluat.vn • customs.gov.vn • chinhphu.vn</p>
+        <p>📧 tinnam888888_haiquan.streamlit.app</p>
+        <p style="margin-top:0.5rem;">© 2024-2026 | Cập nhật liên tục các văn bản mới nhất</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -991,30 +1023,42 @@ def main():
     # Header
     render_header()
 
+    # Auto-update status banner
+    try:
+        from datetime import timedelta
+        data_path = Path(__file__).parent / "data" / "legal-documents.json"
+        mtime = os.path.getmtime(data_path)
+        dt_utc = datetime.utcfromtimestamp(mtime)
+        dt_vn = dt_utc + timedelta(hours=7)
+        last_updated = dt_vn.strftime('%H:%M - %d/%m/%Y')
+        st.success(f"⚡ **Hệ thống Auto-Update AI:** Kho dữ liệu (gồm {len(documents)} văn bản) được đồng bộ lần cuối lúc **{last_updated} (Giờ VN)**.")
+    except Exception as e:
+        pass
+
     # Search
     col_search, col_btn = st.columns([6, 1])
     with col_search:
         query = st.text_input(
-            "?뵇 T챙m ki梳퓅",
-            placeholder="Nh梳춑 c창u h沼뢩 ho梳톍 t沼?kh처a, VD: t梳죑 nh梳춑 t찼i xu梳쩿 c처 b沼?n沼셮 thu梳?kh척ng...",
+            "🔍 Tìm kiếm",
+            placeholder="Nhập câu hỏi hoặc từ khóa, VD: tạm nhập tái xuất có bị nộp thuế không...",
             label_visibility="collapsed",
             key="search_input",
         )
     with col_btn:
         st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-        search_clicked = st.button("?뵇 T챙m", use_container_width=True, type="primary")
+        search_clicked = st.button("🔍 Tìm", use_container_width=True, type="primary")
 
     # Quick search tags
     st.markdown("""
     <div style="text-align:center;margin-bottom:1.5rem;">
-        <span style="color:#64748b;font-size:0.8rem;">G沼즜 첵: </span>
-        <span class="quick-tag">T梳죑 nh梳춑 t찼i xu梳쩿</span>
-        <span class="quick-tag">Thu梳?xu梳쩿 kh梳쯷</span>
-        <span class="quick-tag">Th沼?t沼쩭 th척ng quan</span>
-        <span class="quick-tag">Quy t梳칌 xu梳쩿 x沼?C/O</span>
-        <span class="quick-tag">Kho ngo梳죍 quan</span>
-        <span class="quick-tag">Gia c척ng xu梳쩿 kh梳쯷</span>
-        <span class="quick-tag">M찾 lo梳죍 h챙nh G13</span>
+        <span style="color:#64748b;font-size:0.8rem;">Gợi ý: </span>
+        <span class="quick-tag">Tạm nhập tái xuất</span>
+        <span class="quick-tag">Thuế xuất khẩu</span>
+        <span class="quick-tag">Thủ tục thông quan</span>
+        <span class="quick-tag">Quy tắc xuất xứ C/O</span>
+        <span class="quick-tag">Kho ngoại quan</span>
+        <span class="quick-tag">Gia công xuất khẩu</span>
+        <span class="quick-tag">Mã loại hình G13</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1025,18 +1069,18 @@ def main():
     # Filters
     filter_col1, filter_col2, filter_col3, filter_col4 = st.columns([2, 1, 1, 1])
     with filter_col1:
-        type_options = ["T梳쩿 c梳?] + [TYPE_NAMES[t] for t in TYPE_NAMES]
-        selected_type = st.selectbox("?뱛 Lo梳죍 v훱n b梳즢", type_options, label_visibility="visible")
+        type_options = ["Tất cả"] + [TYPE_NAMES[t] for t in TYPE_NAMES]
+        selected_type = st.selectbox("📂 Loại văn bản", type_options, label_visibility="visible")
     with filter_col2:
-        status_options = ["T梳쩿 c梳?, "C챵n hi沼뇎 l沼켧", "휂찾 s沼춁 휃沼뷼", "H梳퓍 hi沼뇎 l沼켧"]
-        selected_status = st.selectbox("?뱦 Tr梳죒g th찼i", status_options)
+        status_options = ["Tất cả", "Còn hiệu lực", "Đã sửa đổi", "Hết hiệu lực"]
+        selected_status = st.selectbox("📌 Trạng thái", status_options)
     with filter_col3:
         years = sorted(set(d.get('issueDate', '')[:4] for d in documents if d.get('issueDate')), reverse=True)
-        year_options = ["T梳쩿 c梳?] + years
-        selected_year = st.selectbox("?뱟 N훱m", year_options)
+        year_options = ["Tất cả"] + years
+        selected_year = st.selectbox("📅 Năm", year_options)
     with filter_col4:
-        sort_options = {"M沼쌻 nh梳쩿": "newest", "C크 nh梳쩿": "oldest", "Li챗n quan nh梳쩿": "relevance"}
-        selected_sort = st.selectbox("?봼 S梳칛 x梳퓈", list(sort_options.keys()))
+        sort_options = {"Mới nhất": "newest", "Cũ nhất": "oldest", "Liên quan nhất": "relevance"}
+        selected_sort = st.selectbox("🔃 Sắp xếp", list(sort_options.keys()))
 
     st.divider()
 
@@ -1053,20 +1097,20 @@ def main():
         filtered_docs = search_documents(documents, query)
 
     # Apply type filter
-    if selected_type != "T梳쩿 c梳?:
+    if selected_type != "Tất cả":
         type_key = [k for k, v in TYPE_NAMES.items() if v == selected_type]
         if type_key:
             filtered_docs = [d for d in filtered_docs if d.get('type') == type_key[0]]
 
     # Apply status filter
-    status_map = {"C챵n hi沼뇎 l沼켧": "active", "휂찾 s沼춁 휃沼뷼": "amended", "H梳퓍 hi沼뇎 l沼켧": "expired"}
-    if selected_status != "T梳쩿 c梳?:
+    status_map = {"Còn hiệu lực": "active", "Đã sửa đổi": "amended", "Hết hiệu lực": "expired"}
+    if selected_status != "Tất cả":
         s = status_map.get(selected_status)
         if s:
             filtered_docs = [d for d in filtered_docs if d.get('status') == s]
 
     # Apply year filter
-    if selected_year != "T梳쩿 c梳?:
+    if selected_year != "Tất cả":
         filtered_docs = [d for d in filtered_docs if d.get('issueDate', '').startswith(selected_year)]
 
     # Apply sort (only if not search-relevance)
@@ -1084,8 +1128,8 @@ def main():
     # Results count
     if query:
         st.markdown(
-            f'<p style="color:#94a3b8;font-size:0.9rem;">?뵇 T챙m th梳쪅 <strong style="color:#6366f1;">'
-            f'{len(filtered_docs)}</strong> k梳퓍 qu梳?cho "<em>{query}</em>"</p>',
+            f'<p style="color:#94a3b8;font-size:0.9rem;">🔍 Tìm thấy <strong style="color:#6366f1;">'
+            f'{len(filtered_docs)}</strong> kết quả cho "<em>{query}</em>"</p>',
             unsafe_allow_html=True
         )
 
@@ -1093,9 +1137,9 @@ def main():
     if not filtered_docs:
         st.markdown("""
         <div style="text-align:center;padding:3rem;color:#64748b;">
-            <div style="font-size:3rem;">?벊</div>
-            <h3 style="color:#94a3b8;">Kh척ng t챙m th梳쪅 v훱n b梳즢 n횪o</h3>
-            <p>Th沼?thay 휃沼뷼 t沼?kh처a ho梳톍 b沼?l沼뛠</p>
+            <div style="font-size:3rem;">📭</div>
+            <h3 style="color:#94a3b8;">Không tìm thấy văn bản nào</h3>
+            <p>Thử thay đổi từ khóa hoặc bộ lọc</p>
         </div>
         """, unsafe_allow_html=True)
     else:
@@ -1103,7 +1147,7 @@ def main():
         col_list, col_detail = st.columns([2, 3])
 
         with col_list:
-            st.markdown(f"**?뱴 Danh s찼ch ({len(filtered_docs)} v훱n b梳즢)**")
+            st.markdown(f"**📚 Danh sách ({len(filtered_docs)} văn bản)**")
 
             # Pagination
             page_size = 10
@@ -1118,7 +1162,7 @@ def main():
 
             for doc in page_docs:
                 render_doc_card(doc, keywords)
-                if st.button(f"?뱰 Xem chi ti梳퓍", key=f"btn_{doc['id']}", use_container_width=True):
+                if st.button(f"📖 Xem chi tiết", key=f"btn_{doc['id']}", use_container_width=True):
                     st.session_state.selected_doc = doc['id']
                     st.rerun()
 
@@ -1126,7 +1170,7 @@ def main():
             if total_pages > 1:
                 pg_cols = st.columns([1, 2, 1])
                 with pg_cols[0]:
-                    if st.button("? Tr튼沼쌵", disabled=st.session_state.current_page <= 1):
+                    if st.button("◀ Trước", disabled=st.session_state.current_page <= 1):
                         st.session_state.current_page -= 1
                         st.rerun()
                 with pg_cols[1]:
@@ -1135,7 +1179,7 @@ def main():
                         unsafe_allow_html=True
                     )
                 with pg_cols[2]:
-                    if st.button("Sau ??, disabled=st.session_state.current_page >= total_pages):
+                    if st.button("Sau ▶", disabled=st.session_state.current_page >= total_pages):
                         st.session_state.current_page += 1
                         st.rerun()
 
@@ -1145,19 +1189,22 @@ def main():
             if selected_id:
                 doc = next((d for d in documents if d['id'] == selected_id), None)
                 if doc:
-                    st.markdown("**?뱞 Chi ti梳퓍 v훱n b梳즢**")
+                    st.markdown("**📄 Chi tiết văn bản**")
                     render_doc_detail(doc, keywords)
                 else:
-                    st.info("Ch沼뛫 m沼셳 v훱n b梳즢 t沼?danh s찼ch b챗n tr찼i 휃沼?xem chi ti梳퓍.")
+                    st.info("Chọn một văn bản từ danh sách bên trái để xem chi tiết.")
             else:
                 # Show first document by default
                 if filtered_docs:
-                    st.markdown("**?뱞 Chi ti梳퓍 v훱n b梳즢**")
-                    st.info("?몚 Nh梳쩸 **Xem chi ti梳퓍** 沼?danh s찼ch b챗n tr찼i 휃沼?xem n沼셢 dung v훱n b梳즢.")
+                    st.markdown("**📄 Chi tiết văn bản**")
+                    st.info("👈 Nhấn **Xem chi tiết** ở danh sách bên trái để xem nội dung văn bản.")
 
     # Footer
     render_footer()
 
 
-if __name__ == "__main__":
-    main()
+# ============================================
+# KHỞI CHẠY ỨNG DỤNG
+# ============================================
+# Nếu code chạy đến đây = đã qua bước xác thực ở trên (st.stop() không chặn)
+main()
