@@ -1207,7 +1207,12 @@ def call_gemini_api(query, context_docs, api_key, domain):
 - SAU KHI TRA CỨU INTERNET, kết hợp với CÁC VĂN BẢN ĐƯỢC CUNG CẤP. Nếu Internet có văn bản mới hơn, BẮT BUỘC dùng Internet và ghi rõ Nguồn.
 - BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt thành dạng BẢNG (Table) Markdown."""
 
+    from datetime import datetime
+    current_time_str = datetime.now().strftime('%H:%M:%S ngày %d/%m/%Y')
+    
     prompt = f"""Bạn là {role_desc}
+THỜI GIAN THỰC TẾ HIỆN TẠI CỦA HỆ THỐNG: {current_time_str}. 
+MỆNH LỆNH TỐI CAO: Bạn BẮT BUỘC phải tra cứu Internet để lấy các văn bản được cập nhật sát nhất tính đến đúng thời điểm {current_time_str} này, tuyệt đối không được bỏ sót tài liệu mới nào!
 Nhiệm vụ của bạn là trả lời câu hỏi của người dùng THẬT CHÍNH XÁC TUYỆT ĐỐI VÀ ĐÚNG TRỌNG TÂM CÂU HỎI. LƯU Ý QUAN TRỌNG: BẠN PHẢI ƯU TIÊN SỬ DỤNG CÔNG CỤ GOOGLE SEARCH ĐỂ TÌM LUẬT MỚI NHẤT TRÊN INTERNET TRƯỚC!
 {special_instructions}
 1. ĐẦU TIÊN, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật mới nhất.
