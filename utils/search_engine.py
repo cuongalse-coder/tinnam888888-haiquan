@@ -14,6 +14,22 @@ try:
 except ImportError:
     HAS_RAPIDFUZZ = False
 
+def is_question(query: str) -> bool:
+    """Detect if query is a natural language question."""
+    if not query:
+        return False
+    if '?' in query:
+        return True
+    
+    query_norm = normalize_text(query)
+    patterns = [
+        r'co.*khong', r'la gi', r'bao nhieu', r'the nao', r'nhu the nao',
+        r'lam sao', r'tai sao', r'vi sao', r'o dau', r'khi nao', r'bao gio',
+        r'theo.*nao', r'quy dinh.*gi', r'huong dan.*gi', r'ap dung.*nao'
+    ]
+    return any(re.search(p, query_norm) for p in patterns)
+
+
 
 def normalize_text(text: str) -> str:
     """Normalize Vietnamese text for better search matching."""
@@ -45,9 +61,11 @@ def search_documents(
     Search and filter documents with full-text search and fuzzy matching.
     
     Returns:
-        Tuple of (filtered_documents, total_count)
+        Tuple of (filtered_documents, total_count, is_question)
     """
     results = documents.copy()
+    
+    is_q = is_question(query) if query else False
 
     # === FILTER: Document type ===
     if doc_type and doc_type != "Tất cả":
@@ -120,7 +138,7 @@ def search_documents(
     end_idx = start_idx + page_size
     paginated = results[start_idx:end_idx]
 
-    return paginated, total_count
+    return paginated, total_count, is_q
 
 
 def _calculate_relevance(doc: Dict, query: str) -> float:

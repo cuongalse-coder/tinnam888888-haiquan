@@ -464,7 +464,7 @@ def page_search():
     page_num = st.session_state.get("page_num", 1)
     page_size = 15
 
-    results, total_count = search_documents(
+    results, total_count, is_q = search_documents(
         documents=documents,
         query=query,
         doc_type=selected_type,
@@ -494,6 +494,58 @@ def page_search():
 
     # === Render Results ===
     if results:
+        # Render AI Answer Panel if query is a question
+        if is_q and query:
+            ai_html = f"""
+            <div style="
+                background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(0, 212, 170, 0.05) 100%);
+                border: 1px solid rgba(108, 99, 255, 0.3);
+                border-radius: 16px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 8px 32px rgba(108, 99, 255, 0.1);
+            ">
+                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                    <div style="font-size: 2rem;">🤖</div>
+                    <div>
+                        <h3 style="color: #8B85FF; margin: 0; font-size: 1.2rem; font-weight: 700;">AI Trợ Lý Pháp Luật</h3>
+                        <p style="color: #A0AEC0; margin: 0; font-size: 0.85rem; font-style: italic;">Phân tích từ {min(3, len(results))} văn bản liên quan nhất</p>
+                    </div>
+                </div>
+                <div style="background: rgba(14, 17, 23, 0.5); padding: 1rem; border-radius: 12px; border-left: 4px solid #00D4AA; margin-bottom: 1.5rem;">
+                    <strong style="color: #00D4AA;">Câu hỏi của bạn:</strong> <span style="color: #FAFAFA;">"{query}"</span>
+                </div>
+                <div style="color: #E2E8F0; font-size: 0.95rem; line-height: 1.6;">
+            """
+            for i, doc in enumerate(results[:3], 1):
+                badge_class = get_badge_class(doc.get("loai_van_ban", ""))
+                type_name = doc.get("loai_van_ban", "Văn bản")
+                so_hieu = doc.get("so_hieu", "")
+                tom_tat = doc.get("tom_tat", "")
+                # Highlight keywords in tom_tat
+                tom_tat_hl = highlight_text(tom_tat, query, 300)
+                
+                ai_html += f"""
+                    <div style="margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>
+                            Theo <span class="badge {badge_class}" style="font-size:0.7rem; padding: 2px 8px;">{type_name}</span> 
+                            <strong style="color: #FAFAFA;">{so_hieu}</strong>:
+                        </div>
+                        <div style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.9rem;">
+                            💡 {tom_tat_hl}
+                        </div>
+                    </div>
+                """
+            ai_html += """
+                </div>
+                <div style="text-align: right; margin-top: 1rem;">
+                    <span style="color: #636E80; font-size: 0.75rem;">⚡ Trả lời tự động dựa trên dữ liệu tra cứu</span>
+                </div>
+            </div>
+            """
+            st.markdown(ai_html, unsafe_allow_html=True)
+
         for doc in results:
             render_document_card(doc, query)
     else:
