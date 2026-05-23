@@ -1268,7 +1268,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             response = model.generate_content(prompt)
             text = response.text
             stats["api_calls"] += 1
