@@ -87,7 +87,7 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 /* === Metric Cards === */
-.st-key-metric_card div[data-testid="stMetric"] {
+div[class*="st-key-metric_card"] div[data-testid="stMetric"] {
     background: var(--bg-card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -99,13 +99,13 @@ html, body, [data-testid="stAppViewContainer"] {
     overflow: hidden;
 }
 
-.st-key-metric_card div[data-testid="stMetric"]:hover {
+div[class*="st-key-metric_card"] div[data-testid="stMetric"]:hover {
     border-color: var(--border-hover);
     box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
 }
 
-.st-key-metric_card div[data-testid="stMetric"]::after {
+div[class*="st-key-metric_card"] div[data-testid="stMetric"]::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -116,7 +116,7 @@ html, body, [data-testid="stAppViewContainer"] {
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
-.st-key-metric_card div[data-testid="stMetric"] label {
+div[class*="st-key-metric_card"] div[data-testid="stMetric"] label {
     color: var(--text-secondary) !important;
     font-size: 0.8rem !important;
     font-weight: 500 !important;
@@ -124,7 +124,7 @@ html, body, [data-testid="stAppViewContainer"] {
     letter-spacing: 0.5px;
 }
 
-.st-key-metric_card div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+div[class*="st-key-metric_card"] div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
     color: var(--text-primary) !important;
     font-size: 1.8rem !important;
     font-weight: 700 !important;
@@ -405,7 +405,7 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 /* === Plotly Charts Container === */
-.st-key-chart_container {
+div[class*="st-key-chart_container"] {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -496,11 +496,11 @@ html, body, [data-testid="stAppViewContainer"] {
         padding: 0.5rem 1rem 3rem 1rem;
     }
 
-    .st-key-metric_card div[data-testid="stMetric"] {
+    div[class*="st-key-metric_card"] div[data-testid="stMetric"] {
         padding: 0.8rem 1rem;
     }
 
-    .st-key-metric_card div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    div[class*="st-key-metric_card"] div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
         font-size: 1.4rem !important;
     }
 }

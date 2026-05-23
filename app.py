@@ -169,14 +169,14 @@ def render_metrics(stats: dict):
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
-        with st.container(key="metric_card"):
+        with st.container(key="metric_card_1"):
             st.metric(
                 label="📚 TỔNG VĂN BẢN",
                 value=f"{stats['total']:,}",
             )
 
     with col2:
-        with st.container(key="metric_card"):
+        with st.container(key="metric_card_2"):
             st.metric(
                 label="📅 TUẦN NÀY",
                 value=f"{stats['this_week']:,}",
@@ -184,14 +184,14 @@ def render_metrics(stats: dict):
             )
 
     with col3:
-        with st.container(key="metric_card"):
+        with st.container(key="metric_card_3"):
             st.metric(
                 label="📆 THÁNG NÀY",
                 value=f"{stats['this_month']:,}",
             )
 
     with col4:
-        with st.container(key="metric_card"):
+        with st.container(key="metric_card_4"):
             active = stats["by_status"].get("Còn hiệu lực", 0)
             st.metric(
                 label="✅ CÒN HIỆU LỰC",
@@ -199,7 +199,7 @@ def render_metrics(stats: dict):
             )
 
     with col5:
-        with st.container(key="metric_card"):
+        with st.container(key="metric_card_5"):
             upcoming = stats["by_status"].get("Sắp có hiệu lực", 0)
             st.metric(
                 label="⏳ SẮP HIỆU LỰC",
@@ -589,7 +589,7 @@ def page_statistics():
     chart_col1, chart_col2 = st.columns(2)
 
     with chart_col1:
-        with st.container(key="chart_container"):
+        with st.container(key="chart_container_1"):
             st.markdown("##### 📋 Phân bổ theo loại văn bản")
             if stats["by_type"]:
                 fig = go.Figure(data=[go.Pie(
@@ -619,7 +619,7 @@ def page_statistics():
                 st.plotly_chart(fig, use_container_width=True)
 
     with chart_col2:
-        with st.container(key="chart_container"):
+        with st.container(key="chart_container_2"):
             st.markdown("##### 📁 Phân bổ theo lĩnh vực")
             if stats["by_category"]:
                 sorted_cats = sorted(stats["by_category"].items(), key=lambda x: x[1], reverse=True)
@@ -649,7 +649,7 @@ def page_statistics():
     chart_col3, chart_col4 = st.columns(2)
 
     with chart_col3:
-        with st.container(key="chart_container"):
+        with st.container(key="chart_container_3"):
             st.markdown("##### 📊 Trạng thái hiệu lực")
             if stats["by_status"]:
                 status_colors = {
@@ -678,7 +678,7 @@ def page_statistics():
                 st.plotly_chart(fig, use_container_width=True)
 
     with chart_col4:
-        with st.container(key="chart_container"):
+        with st.container(key="chart_container_4"):
             st.markdown("##### 🏛️ Top cơ quan ban hành")
             if stats["by_authority"]:
                 sorted_auth = sorted(stats["by_authority"].items(), key=lambda x: x[1], reverse=True)[:8]
@@ -703,7 +703,7 @@ def page_statistics():
                 st.plotly_chart(fig, use_container_width=True)
 
     # === Monthly trend ===
-    with st.container(key="chart_container"):
+    with st.container(key="chart_container_5"):
         st.markdown("##### 📈 Xu hướng ban hành theo tháng")
         if stats["by_month"]:
             sorted_months = sorted(stats["by_month"].items())
