@@ -12,6 +12,10 @@ from datetime import datetime
 from pathlib import Path
 from unidecode import unidecode
 from thefuzz import fuzz
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    DDGS = None
 
 # ============================================
 # PAGE CONFIG
@@ -609,9 +613,25 @@ def highlight_text(text: str, keywords: list) -> str:
     return result
 
 
+def internet_search(query: str, max_results=3) -> list:
+    """Search internet for real-time legal updates from reputable sources."""
+    if DDGS is None:
+        return []
+    try:
+        ddgs = DDGS()
+        # Focus on reputable Vietnam legal sites
+        search_query = f"{query} site:thuvienphapluat.vn OR site:customs.gov.vn OR site:luatvietnam.vn OR site:chinhphu.vn OR site:moj.gov.vn OR site:moit.gov.vn OR site:baohaiquan.vn"
+        results = list(ddgs.text(search_query, region='vn-vi', max_results=max_results))
+        return results
+    except Exception as e:
+        print(f"Internet search error: {e}")
+        return []
+
 def generate_answer(query: str, results: list, keywords: list) -> str:
-    """Generate a structured answer panel for question queries."""
-    if not results:
+    """Generate a structured answer panel for question queries with live internet search."""
+    internet_results = internet_search(query, max_results=3)
+    
+    if not results and not internet_results:
         return ""
 
     html = '<div class="answer-panel" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.15) 0%, rgba(0, 212, 170, 0.08) 100%); border: 1px solid rgba(108, 99, 255, 0.4); box-shadow: 0 8px 32px rgba(108, 99, 255, 0.2);">'
@@ -619,55 +639,70 @@ def generate_answer(query: str, results: list, keywords: list) -> str:
     html += '<div style="font-size: 2.2rem;">🤖</div>'
     html += '<div>'
     html += '<h3 style="color: #8B85FF !important; margin: 0 !important; font-size: 1.3rem !important; font-weight: 700 !important;">AI TRỢ LÝ PHÁP LUẬT</h3>'
-    html += f'<p style="color: #A0AEC0; margin: 0; font-size: 0.85rem; font-style: italic;">Tổng hợp từ {min(3, len(results))} văn bản liên quan nhất</p>'
+    html += f'<p style="color: #A0AEC0; margin: 0; font-size: 0.85rem; font-style: italic;">Phân tích thời gian thực từ Internet & Dữ liệu nội bộ</p>'
     html += '</div></div>'
     html += f'<div style="background: rgba(14, 17, 23, 0.6); padding: 1rem; border-radius: 12px; border-left: 4px solid #00D4AA; margin-bottom: 1.5rem;">'
     html += f'<strong style="color: #00D4AA;">Câu hỏi của bạn:</strong> <span style="color: #FAFAFA;">"{query}"</span></div>'
 
-    for i, doc in enumerate(results[:3], 1):
-        type_name = TYPE_NAMES.get(doc.get('type', ''), doc.get('type', ''))
-        badge_class = TYPE_BADGES.get(doc.get('type', ''), '')
-
-        html += '<div class="answer-item" style="background: rgba(255,255,255,0.03); border-left: 3px solid #6366f1;">'
-        html += f'<div class="answer-item-title" style="margin-bottom: 0.5rem;">'
-        html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
-        html += f'Theo <span class="type-badge {badge_class}">{type_name}</span> '
-        html += f'<strong style="color: #FAFAFA;">{doc.get("number", "")}</strong>'
-
-        issue_date = doc.get('issueDate', '')
-        if issue_date:
-            try:
-                dt = datetime.strptime(issue_date, '%Y-%m-%d')
-                html += f' ({dt.strftime("%d/%m/%Y")})'
-            except:
-                pass
-
-        html += ':</div>'
-
-        # Show relevant key points
-        key_points = doc.get('keyPoints', [])
-        if key_points:
-            html += '<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">'
-            for point in key_points[:3]:
-                highlighted = highlight_text(point, keywords)
-                html += f'💡 {highlighted}<br>'
+    if internet_results:
+        html += '<h4 style="color: #00D4AA; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,212,170,0.3); padding-bottom: 0.5rem;">🌐 Cập nhật trực tuyến mới nhất</h4>'
+        for i, res in enumerate(internet_results, 1):
+            title = res.get('title', '')
+            body = res.get('body', '')
+            href = res.get('href', '#')
+            html += '<div class="answer-item" style="background: rgba(0,212,170,0.05); border-left: 3px solid #00D4AA;">'
+            html += f'<div class="answer-item-title" style="margin-bottom: 0.5rem;">'
+            html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
+            html += f'<a href="{href}" target="_blank" style="color: #00D4AA; text-decoration: none; font-weight: 600;">{title}</a></div>'
+            html += f'<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">💡 {body}</div>'
             html += '</div>'
 
-        # Show relevant articles
-        articles = doc.get('articles', [])
-        if articles:
-            html += '<div class="answer-item-content" style="margin-top:0.5rem;">'
-            for art in articles[:2]:
-                art_title = art.get('number', '') or art.get('title', '')
-                art_content = art.get('content', '')[:300]
-                highlighted_content = highlight_text(art_content, keywords)
-                html += f'<strong style="color:#fbbf24;">{art_title}</strong>: {highlighted_content}<br><br>'
-            html += '</div>'
+    if results:
+        html += '<h4 style="color: #8B85FF; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(139,133,255,0.3); padding-bottom: 0.5rem;">📂 Dữ liệu nội bộ phù hợp nhất</h4>'
+        for i, doc in enumerate(results[:3], 1):
+            type_name = TYPE_NAMES.get(doc.get('type', ''), doc.get('type', ''))
+            badge_class = TYPE_BADGES.get(doc.get('type', ''), '')
 
-        html += '</div>'
+            html += '<div class="answer-item" style="background: rgba(255,255,255,0.03); border-left: 3px solid #8B85FF;">'
+            html += f'<div class="answer-item-title" style="margin-bottom: 0.5rem;">'
+            html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
+            html += f'Theo <span class="type-badge {badge_class}">{type_name}</span> '
+            html += f'<strong style="color: #FAFAFA;">{doc.get("number", "")}</strong>'
+
+            issue_date = doc.get('issueDate', '')
+            if issue_date:
+                try:
+                    dt = datetime.strptime(issue_date, '%Y-%m-%d')
+                    html += f' ({dt.strftime("%d/%m/%Y")})'
+                except:
+                    pass
+
+            html += ':</div>'
+
+            # Show relevant key points
+            key_points = doc.get('keyPoints', [])
+            if key_points:
+                html += '<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">'
+                for point in key_points[:3]:
+                    highlighted = highlight_text(point, keywords)
+                    html += f'💡 {highlighted}<br>'
+                html += '</div>'
+
+            # Show relevant articles
+            articles = doc.get('articles', [])
+            if articles:
+                html += '<div class="answer-item-content" style="margin-top:0.5rem;">'
+                for art in articles[:2]:
+                    art_title = art.get('number', '') or art.get('title', '')
+                    art_content = art.get('content', '')[:300]
+                    highlighted_content = highlight_text(art_content, keywords)
+                    html += f'<strong style="color:#fbbf24;">{art_title}</strong>: {highlighted_content}<br><br>'
+                html += '</div>'
+
+            html += '</div>'
 
     html += '<div style="text-align: right; margin-top: 1.5rem;">'
-    html += '<span style="color: #636E80; font-size: 0.8rem; font-weight: 600;">⚡ Trả lời tự động bởi thuật toán tìm kiếm thông minh</span>'
+    html += '<span style="color: #636E80; font-size: 0.8rem; font-weight: 600;">⚡ Trả lời tự động kết hợp Internet và Dữ liệu nội bộ</span>'
     html += '</div></div>'
     return html
 
