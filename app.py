@@ -385,9 +385,9 @@ div[data-testid="stExpander"] {
     margin-bottom: 1rem !important;
 }
 .ai-response-box mark {
-    background-color: rgba(251, 191, 36, 0.25) !important;
-    color: #fbbf24 !important;
-    font-weight: 800 !important;
+    background-color: #ffd700 !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
     padding: 2px 8px;
     border-radius: 6px;
 }
@@ -1208,13 +1208,13 @@ def call_gemini_api(query, context_docs, api_key, domain):
 - BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt hành chính thành dạng BẢNG (Table) Markdown để dễ nhìn nhất."""
 
     prompt = f"""Bạn là {role_desc}
-Nhiệm vụ của bạn là trả lời câu hỏi của người dùng. LƯU Ý QUAN TRỌNG: BẠN PHẢI ƯU TIÊN SỬ DỤNG CÔNG CỤ GOOGLE SEARCH ĐỂ TÌM LUẬT MỚI NHẤT TRÊN INTERNET TRƯỚC!
+Nhiệm vụ của bạn là trả lời câu hỏi của người dùng THẬT CHÍNH XÁC TUYỆT ĐỐI VÀ ĐÚNG TRỌNG TÂM CÂU HỎI. LƯU Ý QUAN TRỌNG: BẠN PHẢI ƯU TIÊN SỬ DỤNG CÔNG CỤ GOOGLE SEARCH ĐỂ TÌM LUẬT MỚI NHẤT TRÊN INTERNET TRƯỚC!
 {special_instructions}
 1. ĐẦU TIÊN, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật mới nhất.
 2. TIẾP THEO, tham khảo CÁC VĂN BẢN PHÁP LUẬT LIÊN QUAN được cung cấp dưới đây. Nếu thông tin trên Internet mới hơn hoặc khác với văn bản được cung cấp, HÃY ƯU TIÊN THÔNG TIN TỪ INTERNET.
-3. Luôn luôn trích dẫn rõ bạn đang dùng Thông tư/Nghị định nào và lấy từ nguồn Internet hay từ Văn bản được cung cấp.
+3. LUÔN LUÔN trích dẫn CHÍNH XÁC điều nào, khoản nào, thuộc Nghị định nào, Thông tư nào, hoặc Công văn nào. Không nói chung chung. Ghi rõ lấy từ nguồn Internet hay từ Văn bản được cung cấp.
 
-HÃY TRÌNH BÀY ĐẸP MẮT: dùng in đậm, in nghiêng, và ĐẶC BIỆT DÙNG THẺ <mark>nội dung</mark> để BÔI MÀU NỔI BẬT những phần cực kỳ quan trọng (như mã HS, tài khoản kế toán, tỷ lệ %, mức phạt, thời hạn, điều kiện tiên quyết). Trình bày mạch lạc, dễ đọc.
+HÃY TRÌNH BÀY ĐẸP MẮT VÀ RÕ RÀNG: Trả lời ngắn gọn, đúng trọng tâm. CÁC ĐOẠN CẦN LƯU Ý, CÁC ĐIỂM QUAN TRỌNG (như mã HS, tài khoản kế toán, tỷ lệ %, mức phạt, thời hạn, điều kiện tiên quyết) BẮT BUỘC PHẢI BÔI VÀNG ĐẬM RÕ RÀNG bằng cách bọc trong thẻ HTML <mark>nội dung</mark> (ví dụ: <mark>Nghị định 15/2022/NĐ-CP</mark>). Dùng in đậm, in nghiêng hợp lý để mạch lạc, dễ đọc.
 
 CÁC VĂN BẢN ĐƯỢC CUNG CẤP (Hãy đối chiếu với Internet xem còn hiệu lực không):
 {context_text}
