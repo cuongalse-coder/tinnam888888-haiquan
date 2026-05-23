@@ -963,13 +963,13 @@ def render_header(domain):
     title = "⚖️ CỔNG PHÁP LUẬT HẢI QUAN VIỆT NAM" if domain == "Hải quan & Xuất nhập khẩu" else "⚖️ CỔNG PHÁP LUẬT KẾ TOÁN & THUẾ"
     st.markdown(f"""
     <div class="main-header">
-        <h1>{title}</h1>
+        <h1>{title} <span style="font-size: 1rem; color: #fbbf24; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; margin-left: 10px; vertical-align: middle;">[V6886]</span></h1>
         <p style="margin-top:0.5rem; color:#fde047; font-weight:800; font-size: 1.4rem; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">👨‍💻 Phát triển bởi tác giả: Vũ Việt Cường năm 2026</p>
         <p>Tra cứu Thông tư • Nghị định • Nghị quyết • Luật • Công văn • Quyết định</p>
     </div>
     <div style="background: linear-gradient(90deg, #10b981 0%, #059669 100%); padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
         <span style="color: white; font-weight: bold; font-size: 1.1rem;">
-            🔄 HỆ THỐNG AUTO-UPDATE (VER 2.0) ĐÃ CẬP NHẬT DỮ LIỆU LÚC: {get_vn_time().strftime('%H:%M - %d/%m/%Y')} (Giờ VN)
+            🔄 HỆ THỐNG AUTO-UPDATE (VER V6886) ĐÃ CẬP NHẬT DỮ LIỆU LÚC: {get_vn_time().strftime('%H:%M - %d/%m/%Y')} (Giờ VN)
         </span>
     </div>
     """, unsafe_allow_html=True)
