@@ -1186,29 +1186,22 @@ def call_gemini_api(query, context_docs, api_key, domain):
     """Sử dụng Gemini API để trả lời câu hỏi pháp lý dựa trên ngữ cảnh."""
     
 
-    # Tạo nội dung ngữ cảnh từ các văn bản (Giảm xuống 3 văn bản để tránh lỗi Token)
-    context_text = "CÁC VĂN BẢN PHÁP LUẬT LIÊN QUAN:\n"
-    for i, doc in enumerate(context_docs[:3], 1):
-        context_text += f"{i}. Tên: {doc.get('title', '')} (Số: {doc.get('number', '')}, Ngày: {doc.get('issueDate', '')})\n"
-        context_text += f"   Tóm tắt: {doc.get('summary', '')}\n"
-        if doc.get('articles'):
-            for art in doc['articles'][:3]:
-                context_text += f"   - {art.get('number', '')}: {art.get('content', '')[:300]}...\n"
-        context_text += "\n"
+    # Bỏ qua dữ liệu cục bộ theo yêu cầu của người dùng, để AI tự tìm 100% trên Internet toàn cầu
+    context_text = ""
         
     if domain == "Hải quan & Xuất nhập khẩu":
         role_desc = "một chuyên gia pháp lý và luật sư Hải quan Việt Nam cực kỳ am hiểu luật cập nhật đến năm 2026."
         special_instructions = """ĐẶC BIỆT LƯU Ý VỀ TRA CỨU HÀNG HÓA, MÃ HS VÀ THUẾ NĂM 2026:
 - CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi, bổ sung bởi Nghị định 310/2025/NĐ-CP. Bắt buộc phải áp dụng các Luật, Nghị định năm 2025/2026 này, KHÔNG ĐƯỢC dùng Luật cũ!
-- BẠN PHẢI SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ TÌM KIẾM CÁC QUY ĐỊNH MỚI NHẤT TRÊN INTERNET TRƯỚC TIÊN.
-- SAU KHI TRA CỨU INTERNET, hãy kết hợp với CÁC VĂN BẢN ĐƯỢC CUNG CẤP BÊN DƯỚI. Nếu Internet có văn bản pháp luật mới hơn, BẮT BUỘC dùng văn bản trên Internet và phải ghi rõ Nguồn.
+- BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU (thuvienphapluat.vn, chinhphu.vn, luatvietnam.vn, haiquanonline...).
+- TUYỆT ĐỐI KHÔNG DÙNG KIẾN THỨC CŨ. Mọi câu trả lời phải lấy dữ liệu thực tế ngay tại thời điểm tra cứu trên Internet. Bắt buộc ghi rõ Nguồn tra cứu.
 - BẮT BUỘC TRÌNH BÀY thông tin Thuế, HS Code, mức phạt dưới dạng BẢNG (Table) Markdown."""
     else:
         role_desc = "một Kế toán trưởng kiêm Chuyên gia tư vấn Thuế am hiểu sâu sắc luật kế toán Việt Nam cập nhật đến năm 2026."
         special_instructions = """ĐẶC BIỆT LƯU Ý VỀ KẾ TOÁN VÀ THUẾ NỘI ĐỊA NĂM 2026:
 - CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi bởi Nghị định 310/2025/NĐ-CP. Thông tư 200/2014/TT-BTC ĐÃ BỊ THAY THẾ bởi Thông tư 99/2025/TT-BTC. Bắt buộc phải áp dụng các Luật, Nghị định, Thông tư năm 2025/2026 này! TUYỆT ĐỐI KHÔNG DÙNG LUẬT CŨ.
-- BẠN PHẢI SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ TÌM KIẾM TRÊN INTERNET TRƯỚC TIÊN.
-- SAU KHI TRA CỨU INTERNET, kết hợp với CÁC VĂN BẢN ĐƯỢC CUNG CẤP. Nếu Internet có văn bản mới hơn, BẮT BUỘC dùng Internet và ghi rõ Nguồn.
+- BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU.
+- TUYỆT ĐỐI KHÔNG DÙNG KIẾN THỨC CŨ. Mọi câu trả lời phải dựa 100% vào dữ liệu thực tế tra cứu được trên Internet. Bắt buộc ghi rõ Nguồn tra cứu.
 - BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt thành dạng BẢNG (Table) Markdown."""
 
     from datetime import datetime
@@ -1216,17 +1209,13 @@ def call_gemini_api(query, context_docs, api_key, domain):
     
     prompt = f"""Bạn là {role_desc}
 THỜI GIAN THỰC TẾ HIỆN TẠI CỦA HỆ THỐNG: {current_time_str}. 
-MỆNH LỆNH TỐI CAO: Bạn BẮT BUỘC phải tra cứu Internet để lấy các văn bản được cập nhật sát nhất tính đến đúng thời điểm {current_time_str} này, tuyệt đối không được bỏ sót tài liệu mới nào!
-Nhiệm vụ của bạn là trả lời câu hỏi của người dùng THẬT CHÍNH XÁC TUYỆT ĐỐI VÀ ĐÚNG TRỌNG TÂM CÂU HỎI. LƯU Ý QUAN TRỌNG: BẠN PHẢI ƯU TIÊN SỬ DỤNG CÔNG CỤ GOOGLE SEARCH ĐỂ TÌM LUẬT MỚI NHẤT TRÊN INTERNET TRƯỚC!
+MỆNH LỆNH TỐI CAO: Bạn BẮT BUỘC phải tra cứu Internet để lấy các văn bản được cập nhật sát nhất tính đến đúng thời điểm {current_time_str} này, tuyệt đối không được bỏ sót tài liệu mới nào! TUYỆT ĐỐI KHÔNG DÙNG DỮ LIỆU HUẤN LUYỆN CŨ CỦA BẠN.
+Nhiệm vụ của bạn là trả lời câu hỏi của người dùng THẬT CHÍNH XÁC TUYỆT ĐỐI VÀ ĐÚNG TRỌNG TÂM CÂU HỎI. 
 {special_instructions}
-1. ĐẦU TIÊN, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật mới nhất.
-2. TIẾP THEO, tham khảo CÁC VĂN BẢN PHÁP LUẬT LIÊN QUAN được cung cấp dưới đây. Nếu thông tin trên Internet mới hơn hoặc khác với văn bản được cung cấp, HÃY ƯU TIÊN THÔNG TIN TỪ INTERNET.
-3. LUÔN LUÔN trích dẫn CHÍNH XÁC điều nào, khoản nào, thuộc Nghị định nào, Thông tư nào, hoặc Công văn nào. Không nói chung chung. Ghi rõ lấy từ nguồn Internet hay từ Văn bản được cung cấp.
+1. ĐẦU TIÊN VÀ DUY NHẤT, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín trên internet toàn cầu (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật.
+2. LUÔN LUÔN trích dẫn CHÍNH XÁC điều nào, khoản nào, thuộc Nghị định nào, Thông tư nào, hoặc Công văn nào. Không nói chung chung. Bắt buộc kèm đường link hoặc tên trang web Nguồn Internet.
 
 HÃY TRÌNH BÀY ĐẸP MẮT VÀ RÕ RÀNG: Trả lời ngắn gọn, đúng trọng tâm. CÁC ĐOẠN CẦN LƯU Ý, CÁC ĐIỂM QUAN TRỌNG (như mã HS, tài khoản kế toán, tỷ lệ %, mức phạt, thời hạn, điều kiện tiên quyết) BẮT BUỘC PHẢI BÔI VÀNG ĐẬM RÕ RÀNG bằng cách bọc trong thẻ HTML <mark>nội dung</mark> (ví dụ: <mark>Nghị định 15/2022/NĐ-CP</mark>). Dùng in đậm, in nghiêng hợp lý để mạch lạc, dễ đọc.
-
-CÁC VĂN BẢN ĐƯỢC CUNG CẤP (Hãy đối chiếu với Internet xem còn hiệu lực không):
-{context_text}
 
 CÂU HỎI CỦA NGƯỜI DÙNG:
 {query}
