@@ -9,3 +9,6 @@ rapidfuzz>=3.10.0
 duckduckgo-search>=6.0.0
 unidecode
 thefuzz
+python-Levenshtein>=0.25.0
+feedparser>=6.0.11
+google-generativeai>=0.4.1

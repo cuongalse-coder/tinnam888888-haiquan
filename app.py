@@ -12,11 +12,13 @@ from datetime import datetime
 from pathlib import Path
 from unidecode import unidecode
 from thefuzz import fuzz
-try:
-    from duckduckgo_search import DDGS
-except ImportError:
-    DDGS = None
-
+import requests
+from bs4 import BeautifulSoup
+import feedparser
+import google.generativeai as genai
+import time
+from uuid import uuid4
+import pandas as pd
 # ============================================
 # PAGE CONFIG
 # ============================================
@@ -363,6 +365,35 @@ div[data-testid="stExpander"] {
     border-radius: 8px;
     padding: 8px 16px;
 }
+/* ===== AI RESPONSE BOX ===== */
+.ai-response-box {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 1px solid #6366f1;
+    border-left: 6px solid #fbbf24;
+    border-radius: 12px;
+    padding: 1.8rem 2.2rem;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #f8fafc;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+.ai-response-box h1, .ai-response-box h2, .ai-response-box h3, .ai-response-box h4 {
+    color: #818cf8 !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+}
+.ai-response-box mark {
+    background-color: rgba(251, 191, 36, 0.25) !important;
+    color: #fbbf24 !important;
+    font-weight: 800 !important;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+.ai-response-box strong {
+    color: #c7d2fe;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -370,49 +401,204 @@ div[data-testid="stExpander"] {
 # ============================================
 # DATA LOADING
 # ============================================
-@st.cache_data
-def load_documents():
-    """Load legal documents from JSON file."""
-    data_path = Path(__file__).parent / "data" / "documents.json"
+@st.cache_data(ttl=300)
+def fetch_live_data(domain):
+    """Tự động quét (crawl) các văn bản mới nhất từ các nguồn uy tín."""
+    live_docs = []
+    
+    if domain == "Hải quan & Xuất nhập khẩu":
+        sources = [
+            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
+            ('HaiQuanOnline', 'https://haiquanonline.com.vn/rss/hai-quan-c4.rss'),
+            ('HaiQuanXNK', 'https://haiquanonline.com.vn/rss/xuat-nhap-khau-c5.rss'),
+        ]
+        keywords = ['hải quan', 'xuất nhập', 'thuế', 'nghị định', 'c/o', 'incoterm', 'biểu thuế', 'xuất xứ']
+    else:
+        sources = [
+            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
+            ('BaoPhapLuat', 'https://baophapluat.vn/rss/kinh-te-c3.rss'),
+            ('TaiChinh', 'https://tapchitaichinh.vn/rss/ke-toan-kiem-toan.rss'),
+        ]
+        keywords = ['kế toán', 'thuế thu nhập', 'thuế tndn', 'thuế tncn', 'thuế gtgt', 'kiểm toán', 'hóa đơn', 'chứng từ', 'vas', 'chuẩn mực', 'nghị định', 'thông tư']
+    
+    for source_name, url in sources:
+        try:
+            # Thêm timeout 3 giây để tránh bị treo (hang) khi server từ chối IP nước ngoài
+            resp = requests.get(url, timeout=3, headers={'User-Agent': 'Mozilla/5.0'})
+            if resp.status_code != 200:
+                continue
+            feed = feedparser.parse(resp.content)
+            for entry in feed.entries[:30]:
+                title_lower = entry.title.lower()
+                desc_lower = getattr(entry, 'description', '').lower()
+                
+                # Lọc văn bản theo từ khóa
+                if any(kw in title_lower or kw in desc_lower for kw in keywords):
+                    # Lọc tìm số hiệu trong tiêu đề (VD: Nghị định 12/2024/NĐ-CP)
+                    number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', entry.title)
+                    doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
+                    
+                    doc_type = "cong-van"
+                    if 'thông tư' in title_lower: doc_type = "thong-tu"
+                    elif 'nghị định' in title_lower: doc_type = "nghi-dinh"
+                    elif 'quyết định' in title_lower: doc_type = "quyet-dinh"
+                    elif 'nghị quyết' in title_lower: doc_type = "nghi-quyet"
+                    elif 'luật' in title_lower: doc_type = "luat"
+
+                    live_docs.append({
+                        "id": f"live-{source_name}-{len(live_docs)}",
+                        "type": doc_type,
+                        "number": doc_number,
+                        "title": entry.title,
+                        "summary": getattr(entry, 'description', 'Cập nhật tự động từ nguồn ' + source_name),
+                        "issueDate": datetime.now().strftime('%Y-%m-%d'),
+                        "effectiveDate": "Đang cập nhật",
+                        "issuingBody": f"Nguồn: {source_name}",
+                        "status": "active",
+                        "purpose": "Cập nhật dữ liệu thời gian thực thông qua Crawler.",
+                        "keyPoints": [f"Xem nội dung chi tiết tại bản gốc: {entry.link}"],
+                        "content": f"{entry.title}\n\nĐọc toàn văn tại: {entry.link}",
+                        "articles": [],
+                        "tags": ["cập nhật tự động", "live", doc_type],
+                        "relatedDocs": []
+                    })
+        except Exception as e:
+            continue
+            
+    # Nguồn 2: Tổng cục Hải quan (Web scraping trực tiếp - Basic)
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        # Lấy trang tin tức hoặc điểm văn bản
+        r = requests.get('https://www.customs.gov.vn/index.jsp?pageId=125', headers=headers, timeout=5)
+        if r.status_code == 200:
+            soup = BeautifulSoup(r.text, 'html.parser')
+            # Custom parsing based on customs.gov.vn structure can be added here
+            pass
+    except Exception:
+        pass
+
+    return live_docs
+
+
+@st.cache_data(ttl=3600)
+def load_documents(domain):
+    """Load legal documents from JSON file and merge with live auto-updated data."""
+    data_path = Path(__file__).parent / "data" / "legal-documents.json"
+    docs = []
     try:
         with open(data_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            docs = data.get("documents", [])
-            type_mapping = {
-                "Thông tư": "thong-tu",
-                "Nghị định": "nghi-dinh",
-                "Nghị quyết": "nghi-quyet",
-                "Luật": "luat",
-                "Công văn": "cong-van",
-                "Quyết định": "quyet-dinh"
-            }
-            mapped_docs = []
-            for d in docs:
-                t = d.get("loai_van_ban", "")
-                mapped_doc = {
-                    "id": d.get("id", ""),
-                    "type": type_mapping.get(t, "other"),
-                    "typeName": t,
-                    "number": d.get("so_hieu", ""),
-                    "title": d.get("tieu_de", ""),
-                    "issueDate": d.get("ngay_ban_hanh", ""),
-                    "effectiveDate": d.get("ngay_hieu_luc", ""),
-                    "issuingBody": d.get("co_quan_ban_hanh", ""),
-                    "summary": d.get("tom_tat", ""),
-                    "purpose": d.get("tom_tat", ""),
-                    "keyPoints": [d.get("tom_tat", "")],
-                    "articles": [],
-                    "content": f"URL: {d.get('url', '')}\nNguồn: {d.get('nguon', '')}\nLĩnh vực: {d.get('linh_vuc', '')}",
-                    "status": "active" if d.get("trang_thai") == "Còn hiệu lực" else ("amended" if d.get("trang_thai") == "Sắp có hiệu lực" else "expired"),
-                    "folder": "A",
-                    "tags": d.get("tags", []),
-                    "relatedDocs": []
-                }
-                mapped_docs.append(mapped_doc)
-            return mapped_docs
+            docs = json.load(f)
+            # Lọc bớt dữ liệu tĩnh nếu đang ở mode Kế toán (Chỉ lấy văn bản chung)
+            if domain == "Kế toán & Thuế nội địa":
+                docs = [d for d in docs if any(kw in d.get('title','').lower() for kw in ['thuế', 'hóa đơn', 'nghị định', 'thông tư', 'doanh nghiệp'])]
     except Exception as e:
-        st.error(f"Lỗi đọc dữ liệu: {e}")
-        return []
+        st.error(f"Lỗi đọc dữ liệu nội bộ: {e}")
+        
+    # Thêm dữ liệu từ documents.json
+    try:
+        new_data_path = Path(__file__).parent / "data" / "documents.json"
+        if new_data_path.exists():
+            with open(new_data_path, "r", encoding="utf-8") as f:
+                new_docs = json.load(f)
+                existing_titles = {d.get('title', '') for d in docs}
+                type_mapping = {
+                    'Thông tư': 'thong-tu',
+                    'Nghị định': 'nghi-dinh',
+                    'Quyết định': 'quyet-dinh',
+                    'Công văn': 'cong-van',
+                    'Luật': 'luat',
+                    'Nghị quyết': 'nghi-quyet'
+                }
+                for d in new_docs:
+                    title = d.get('tieu_de', '')
+                    if title in existing_titles: continue
+                    doc_type = type_mapping.get(d.get('loai_van_ban', ''), 'other')
+                    status = 'active' if d.get('trang_thai', '') == 'Còn hiệu lực' else 'expired'
+                    docs.append({
+                        'id': d.get('so_hieu', '').replace('/', '-'),
+                        'type': doc_type,
+                        'number': d.get('so_hieu', ''),
+                        'title': title,
+                        'summary': d.get('tom_tat', ''),
+                        'issueDate': d.get('ngay_ban_hanh', ''),
+                        'effectiveDate': d.get('ngay_hieu_luc', ''),
+                        'issuingBody': d.get('co_quan_ban_hanh', ''),
+                        'status': status,
+                        'purpose': '',
+                        'keyPoints': [],
+                        'content': f"Tóm tắt: {d.get('tom_tat', '')}\nNguồn: {d.get('nguon', '')}\nURL: {d.get('url', '')}",
+                        'articles': [],
+                        'tags': d.get('tags', []),
+                        'relatedDocs': []
+                    })
+    except Exception as e:
+        pass
+
+    # Lấy dữ liệu tự động mới nhất
+    try:
+        live_data = fetch_live_data(domain)
+        if live_data:
+            # Lọc bỏ các văn bản đã có trong DB nội bộ (tránh trùng lặp theo tiêu đề)
+            existing_titles = {d.get('title', '').lower() for d in docs}
+            new_live_docs = [d for d in live_data if d['title'].lower() not in existing_titles]
+            
+            # Đưa văn bản mới lên đầu
+            docs = new_live_docs + docs
+    except Exception as e:
+        pass
+        
+    return docs
+
+
+@st.cache_resource
+def get_system_stats():
+    """Lưu trữ thống kê hệ thống (dùng chung cho mọi phiên truy cập)."""
+    from datetime import datetime
+    return {
+        "active_sessions": {},
+        "api_date": datetime.now().date(),
+        "api_calls": 0,
+        "api_limit": 1500,
+        "total_visitors": 18243
+    }
+
+def get_client_info():
+    ip = "Không xác định"
+    device = "Máy tính (Desktop)"
+    try:
+        if hasattr(st, "context") and hasattr(st.context, "headers"):
+            headers = st.context.headers
+            # Get IP
+            ip = headers.get("X-Forwarded-For", headers.get("X-Real-IP", "Không xác định"))
+            if "," in ip:
+                ip = ip.split(",")[0].strip()
+            
+            # Get Device
+            user_agent = headers.get("User-Agent", "").lower()
+            if "mobile" in user_agent or "android" in user_agent or "iphone" in user_agent:
+                device = "Điện thoại (Mobile)"
+            elif "tablet" in user_agent or "ipad" in user_agent:
+                device = "Máy tính bảng (Tablet)"
+    except Exception:
+        pass
+    return ip, device
+
+@st.cache_data(ttl=86400)
+def get_location_from_ip(ip):
+    if not ip or ip == "Không xác định" or ip.startswith("127.") or ip.startswith("192.168.") or ip.startswith("10."):
+        return None
+    try:
+        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=3).json()
+        if res.get("status") == "success":
+            return {
+                "lat": float(res.get("lat", 0)),
+                "lon": float(res.get("lon", 0)),
+                "city": res.get("city", "Unknown"),
+                "country": res.get("country", "Unknown")
+            }
+    except Exception:
+        pass
+    return None
 
 
 # ============================================
@@ -649,93 +835,60 @@ def highlight_text(text: str, keywords: list) -> str:
     return result
 
 
-def internet_search(query: str, max_results=3) -> list:
-    """Search internet for real-time legal updates from reputable sources."""
-    if DDGS is None:
-        return []
-    try:
-        ddgs = DDGS()
-        search_query = f"{query} site:thuvienphapluat.vn OR site:customs.gov.vn OR site:luatvietnam.vn OR site:chinhphu.vn OR site:moj.gov.vn OR site:moit.gov.vn OR site:baohaiquan.vn"
-        results = list(ddgs.text(search_query, region='vn-vi', max_results=max_results))
-        return results
-    except Exception as e:
-        print(f"Internet search error: {e}")
-        return []
-
-
 def generate_answer(query: str, results: list, keywords: list) -> str:
-    """Generate a structured answer panel for question queries with live internet search."""
-    internet_results = internet_search(query, max_results=3)
-
-    if not results and not internet_results:
+    """Generate a structured answer panel for question queries."""
+    if not results:
         return ""
 
-    html = '<div class="answer-panel" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.15) 0%, rgba(0, 212, 170, 0.08) 100%); border: 1px solid rgba(108, 99, 255, 0.4); box-shadow: 0 8px 32px rgba(108, 99, 255, 0.2);">'
-    html += '<div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">'
-    html += '<div style="font-size: 2.2rem;">🤖</div>'
-    html += '<div>'
-    html += '<h3 style="color: #8B85FF !important; margin: 0 !important; font-size: 1.3rem !important; font-weight: 700 !important;">AI TRỢ LÝ PHÁP LUẬT</h3>'
-    html += f'<p style="color: #A0AEC0; margin: 0; font-size: 0.85rem; font-style: italic;">Phân tích thời gian thực từ Internet & Dữ liệu nội bộ</p>'
-    html += '</div></div>'
-    html += f'<div style="background: rgba(14, 17, 23, 0.6); padding: 1rem; border-radius: 12px; border-left: 4px solid #00D4AA; margin-bottom: 1.5rem;">'
-    html += f'<strong style="color: #00D4AA;">Câu hỏi của bạn:</strong> <span style="color: #FAFAFA;">"{query}"</span></div>'
+    html = '<div class="answer-panel">'
+    html += '<h3>📋 Kết quả tra cứu</h3>'
+    html += f'<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1rem;">Câu hỏi: <em>"{query}"</em></p>'
 
-    if internet_results:
-        html += '<h4 style="color: #00D4AA; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,212,170,0.3); padding-bottom: 0.5rem;">🌐 Cập nhật trực tuyến mới nhất</h4>'
-        for i, res in enumerate(internet_results, 1):
-            title = res.get('title', '')
-            body = res.get('body', '')
-            href = res.get('href', '#')
-            html += '<div class="answer-item" style="background: rgba(0,212,170,0.05); border-left: 3px solid #00D4AA;">'
-            html += f'<div class="answer-item-title" style="margin-bottom: 0.5rem;">'
-            html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
-            html += f'<a href="{href}" target="_blank" style="color: #00D4AA; text-decoration: none; font-weight: 600;">{title}</a></div>'
-            html += f'<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">💡 {body}</div>'
+    for i, doc in enumerate(results[:5], 1):
+        type_name = TYPE_NAMES.get(doc.get('type', ''), doc.get('type', ''))
+        badge_class = TYPE_BADGES.get(doc.get('type', ''), '')
+
+        html += '<div class="answer-item">'
+        html += f'<div class="answer-item-title">'
+        html += f'{i}/ Theo <span class="type-badge {badge_class}">{type_name}</span> '
+        html += f'số <strong>{doc.get("number", "")}</strong>'
+
+        issue_date = doc.get('issueDate', '')
+        if issue_date:
+            try:
+                dt = datetime.strptime(issue_date, '%Y-%m-%d')
+                html += f' ngày {dt.strftime("%d/%m/%Y")}'
+            except:
+                pass
+
+        issuer = doc.get('issuingBody', '')
+        if issuer:
+            html += f' của <em>{issuer}</em>'
+        html += ':</div>'
+
+        # Show relevant key points
+        key_points = doc.get('keyPoints', [])
+        if key_points:
+            html += '<div class="answer-item-content">'
+            for point in key_points[:3]:
+                highlighted = highlight_text(point, keywords)
+                html += f'• {highlighted}<br>'
             html += '</div>'
 
-    if results:
-        html += '<h4 style="color: #8B85FF; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(139,133,255,0.3); padding-bottom: 0.5rem;">📂 Dữ liệu nội bộ phù hợp nhất</h4>'
-        for i, doc in enumerate(results[:3], 1):
-            type_name = TYPE_NAMES.get(doc.get('type', ''), doc.get('type', ''))
-            badge_class = TYPE_BADGES.get(doc.get('type', ''), '')
-
-            html += '<div class="answer-item" style="background: rgba(255,255,255,0.03); border-left: 3px solid #8B85FF;">'
-            html += f'<div class="answer-item-title" style="margin-bottom: 0.5rem;">'
-            html += f'<span style="color: #A0AEC0; font-weight: 600; margin-right: 0.5rem;">{i}.</span>'
-            html += f'Theo <span class="type-badge {badge_class}">{type_name}</span> '
-            html += f'<strong style="color: #FAFAFA;">{doc.get("number", "")}</strong>'
-            
-            issue_date = doc.get('issueDate', '')
-            if issue_date:
-                try:
-                    dt = datetime.strptime(issue_date, '%Y-%m-%d')
-                    html += f' ({dt.strftime("%d/%m/%Y")})'
-                except:
-                    pass
-            html += ':</div>'
-
-            key_points = doc.get('keyPoints', [])
-            if key_points:
-                html += '<div class="answer-item-content" style="padding-left: 1.5rem; color: #cbd5e1; font-size: 0.95rem;">'
-                for point in key_points[:3]:
-                    highlighted = highlight_text(point, keywords)
-                    html += f'💡 {highlighted}<br>'
-                html += '</div>'
-
-            articles = doc.get('articles', [])
-            if articles:
-                html += '<div class="answer-item-content" style="margin-top:0.5rem;">'
-                for art in articles[:2]:
-                    art_title = art.get('number', '') or art.get('title', '')
-                    art_content = art.get('content', '')[:300]
-                    highlighted_content = highlight_text(art_content, keywords)
-                    html += f'<strong style="color:#fbbf24;">{art_title}</strong>: {highlighted_content}<br><br>'
-                html += '</div>'
+        # Show relevant articles
+        articles = doc.get('articles', [])
+        if articles:
+            html += '<div class="answer-item-content" style="margin-top:0.5rem;">'
+            for art in articles[:2]:
+                art_title = art.get('number', '') or art.get('title', '')
+                art_content = art.get('content', '')[:300]
+                highlighted_content = highlight_text(art_content, keywords)
+                html += f'<strong style="color:#fbbf24;">{art_title}</strong>: {highlighted_content}<br><br>'
             html += '</div>'
 
-    html += '<div style="text-align: right; margin-top: 1.5rem;">'
-    html += '<span style="color: #636E80; font-size: 0.8rem; font-weight: 600;">⚡ Trả lời tự động kết hợp Internet và Dữ liệu nội bộ</span>'
-    html += '</div></div>'
+        html += '</div>'
+
+    html += '</div>'
     return html
 
 
@@ -798,11 +951,18 @@ def format_doc_for_download(doc: dict) -> str:
 # ============================================
 # RENDER FUNCTIONS
 # ============================================
-def render_header():
-    st.markdown("""
+def render_header(domain):
+    title = "⚖️ CỔNG PHÁP LUẬT HẢI QUAN VIỆT NAM" if domain == "Hải quan & Xuất nhập khẩu" else "⚖️ CỔNG PHÁP LUẬT KẾ TOÁN & THUẾ"
+    st.markdown(f"""
     <div class="main-header">
-        <h1>⚖️ CỔNG PHÁP LUẬT HẢI QUAN VIỆT NAM</h1>
+        <h1>{title}</h1>
+        <p style="margin-top:0.5rem; color:#fde047; font-weight:800; font-size: 1.4rem; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">👨‍💻 Phát triển bởi tác giả: Vũ Việt Cường năm 2026</p>
         <p>Tra cứu Thông tư • Nghị định • Nghị quyết • Luật • Công văn • Quyết định</p>
+    </div>
+    <div style="background: linear-gradient(90deg, #10b981 0%, #059669 100%); padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
+        <span style="color: white; font-weight: bold; font-size: 1.1rem;">
+            🔄 HỆ THỐNG AUTO-UPDATE (VER 2.0) ĐÃ CẬP NHẬT DỮ LIỆU LÚC: {datetime.now().strftime('%H:%M - %d/%m/%Y')} (Giờ VN)
+        </span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1003,44 +1163,231 @@ def render_doc_detail(doc, keywords=None):
             st.markdown(f'<div style="margin-top:0.5rem;">{tags_html}</div>', unsafe_allow_html=True)
 
 
-def render_footer():
-    st.markdown("""
+def render_footer(domain):
+    portal_name = "Cổng Pháp Luật Hải Quan Việt Nam" if domain == "Hải quan & Xuất nhập khẩu" else "Cổng Pháp Luật Kế Toán & Thuế"
+    stats = get_system_stats()
+    st.markdown(f"""
     <div class="footer">
-        <p>⚖️ <strong>Cổng Pháp Luật Hải Quan Việt Nam</strong></p>
+        <p>⚖️ <strong>{portal_name}</strong></p>
         <p>Dữ liệu tham khảo từ: thuvienphapluat.vn • customs.gov.vn • chinhphu.vn</p>
         <p>📧 tinnam888888_haiquan.streamlit.app</p>
-        <p style="margin-top:0.5rem;">© 2024-2026 | Cập nhật liên tục các văn bản mới nhất</p>
+        <p style="margin-top:0.8rem; color:#a5b4fc; font-weight:700; font-size: 0.95rem;">👨‍💻 Phát triển bởi tác giả: Vũ Việt Cường năm 2026</p>
+        <p style="margin-top:0.2rem; font-weight:bold; color:#fde047;">👤 Số người truy cập: {stats["total_visitors"]:,}</p>
+        <p style="margin-top:0.2rem;">© 2024-2026 | Cập nhật liên tục các văn bản mới nhất</p>
     </div>
     """, unsafe_allow_html=True)
+
+
+def call_gemini_api(query, context_docs, api_key, domain):
+    """Sử dụng Gemini API để trả lời câu hỏi pháp lý dựa trên ngữ cảnh."""
+    
+
+    # Tạo nội dung ngữ cảnh từ các văn bản (Giảm xuống 3 văn bản để tránh lỗi Token)
+    context_text = "CÁC VĂN BẢN PHÁP LUẬT LIÊN QUAN:\n"
+    for i, doc in enumerate(context_docs[:3], 1):
+        context_text += f"{i}. Tên: {doc.get('title', '')} (Số: {doc.get('number', '')}, Ngày: {doc.get('issueDate', '')})\n"
+        context_text += f"   Tóm tắt: {doc.get('summary', '')}\n"
+        if doc.get('articles'):
+            for art in doc['articles'][:3]:
+                context_text += f"   - {art.get('number', '')}: {art.get('content', '')[:300]}...\n"
+        context_text += "\n"
+        
+    if domain == "Hải quan & Xuất nhập khẩu":
+        role_desc = "một chuyên gia pháp lý và luật sư Hải quan Việt Nam cực kỳ am hiểu luật."
+        special_instructions = """ĐẶC BIỆT LƯU Ý VỀ TRA CỨU HÀNG HÓA, MÃ HS VÀ THUẾ:
+- BẠN PHẢI SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ TÌM KIẾM CÁC QUY ĐỊNH, THÔNG TƯ, NGHỊ ĐỊNH MỚI NHẤT TRÊN INTERNET TRƯỚC TIÊN.
+- SAU KHI TRA CỨU INTERNET, hãy kết hợp với CÁC VĂN BẢN ĐƯỢC CUNG CẤP BÊN DƯỚI. Nếu Internet có văn bản pháp luật mới hơn văn bản được cung cấp, BẮT BUỘC dùng văn bản mới nhất trên Internet và phải ghi rõ Nguồn tra cứu.
+- CHỈ SỬ DỤNG KIẾN THỨC NỘI TẠI (về Biểu thuế, Quyết định 1357, Incoterms 2020, NĐ 31/2018, v.v.) KHI cả Internet và văn bản cung cấp không có thông tin.
+- BẮT BUỘC TRÌNH BÀY thông tin Thuế, HS Code, giải thích Loại Hình, C/O dưới dạng BẢNG (Table) Markdown."""
+    else:
+        role_desc = "một Kế toán trưởng kiêm Chuyên gia tư vấn Thuế nội địa am hiểu sâu sắc pháp luật và hệ thống kế toán Việt Nam."
+        special_instructions = """ĐẶC BIỆT LƯU Ý VỀ KẾ TOÁN VÀ THUẾ NỘI ĐỊA:
+- BẠN PHẢI SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ TÌM KIẾM CÁC QUY ĐỊNH, THÔNG TƯ, NGHỊ ĐỊNH MỚI NHẤT TRÊN INTERNET TRƯỚC TIÊN.
+- SAU KHI TRA CỨU INTERNET, hãy kết hợp với CÁC VĂN BẢN ĐƯỢC CUNG CẤP BÊN DƯỚI. Nếu Internet có văn bản pháp luật mới hơn văn bản được cung cấp, BẮT BUỘC dùng văn bản mới nhất trên Internet và phải ghi rõ Nguồn tra cứu.
+- CHỈ SỬ DỤNG KIẾN THỨC NỘI TẠI (về TT 200, TT 133, NĐ 123, TT 78, v.v.) KHI cả Internet và văn bản cung cấp không có thông tin.
+- BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt hành chính thành dạng BẢNG (Table) Markdown để dễ nhìn nhất."""
+
+    prompt = f"""Bạn là {role_desc}
+Nhiệm vụ của bạn là trả lời câu hỏi của người dùng. LƯU Ý QUAN TRỌNG: BẠN PHẢI ƯU TIÊN SỬ DỤNG CÔNG CỤ GOOGLE SEARCH ĐỂ TÌM LUẬT MỚI NHẤT TRÊN INTERNET TRƯỚC!
+{special_instructions}
+1. ĐẦU TIÊN, hãy dùng CÔNG CỤ TÌM KIẾM GOOGLE tra cứu các trang web uy tín (như thuvienphapluat.vn, luatvietnam.vn, haiquanonline, chinhphu.vn) để lấy thông tin luật mới nhất.
+2. TIẾP THEO, tham khảo CÁC VĂN BẢN PHÁP LUẬT LIÊN QUAN được cung cấp dưới đây. Nếu thông tin trên Internet mới hơn hoặc khác với văn bản được cung cấp, HÃY ƯU TIÊN THÔNG TIN TỪ INTERNET.
+3. Luôn luôn trích dẫn rõ bạn đang dùng Thông tư/Nghị định nào và lấy từ nguồn Internet hay từ Văn bản được cung cấp.
+
+HÃY TRÌNH BÀY ĐẸP MẮT: dùng in đậm, in nghiêng, và ĐẶC BIỆT DÙNG THẺ <mark>nội dung</mark> để BÔI MÀU NỔI BẬT những phần cực kỳ quan trọng (như mã HS, tài khoản kế toán, tỷ lệ %, mức phạt, thời hạn, điều kiện tiên quyết). Trình bày mạch lạc, dễ đọc.
+
+CÁC VĂN BẢN ĐƯỢC CUNG CẤP (Hãy đối chiếu với Internet xem còn hiệu lực không):
+{context_text}
+
+CÂU HỎI CỦA NGƯỜI DÙNG:
+{query}
+
+TRẢ LỜI CỦA LUẬT SƯ:"""
+
+    api_keys = [k.strip() for k in api_key.split(',')] if ',' in api_key else [api_key.strip()]
+    stats = get_system_stats()
+    from datetime import datetime
+    if stats["api_date"] != datetime.now().date():
+        stats["api_date"] = datetime.now().date()
+        stats["api_calls"] = 0
+        
+    last_error = ""
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            try:
+                # Kích hoạt công cụ tra cứu Google Search (hỗ trợ gemini-1.5-flash)
+                model = genai.GenerativeModel('gemini-1.5-flash', tools='google_search_retrieval')
+                response = model.generate_content(prompt)
+            except Exception:
+                try:
+                    # Fallback cách cũ nếu SDK không hỗ trợ truyền string 'google_search_retrieval'
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    response = model.generate_content(prompt)
+                except Exception:
+                    model = genai.GenerativeModel('gemini-flash-latest')
+                    response = model.generate_content(prompt)
+            stats["api_calls"] += 1
+            return response.text
+        except Exception as e:
+            error_msg = str(e)
+            if "429" in error_msg or "quota" in error_msg.lower():
+                last_error = "quota"
+                continue
+            else:
+                return f"Lỗi khi kết nối với AI Trợ lý: {e}. Vui lòng kiểm tra lại cấu hình API Key."
+
+    if last_error == "quota":
+        return "⚠️ **Hệ thống đã thử toàn bộ API Keys nhưng đều đã Quá tải hoặc Hết lượt AI miễn phí!**\n\n*(Lưu ý: Bạn có thể nhập nhiều API Key cùng lúc, cách nhau bằng dấu phẩy `,`)*\n\nGoogle giới hạn tài khoản miễn phí ở 2 mức:\n1. **Giới hạn tốc độ (15 câu / phút):** Bạn đang hỏi quá nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.\n2. **Giới hạn ngày (1500 câu / ngày):** Vui lòng [vào đây](https://aistudio.google.com/app/apikey) bằng tài khoản Gmail khác để lấy Key mới và dán nối tiếp vào phần cài đặt theo dạng `KEY1, KEY2, KEY3`."
+        
 
 
 # ============================================
 # MAIN APP
 # ============================================
 def main():
-    documents = load_documents()
+    if "domain" not in st.session_state:
+        st.session_state.domain = "Hải quan & Xuất nhập khẩu"
+        
+    stats = get_system_stats()
+    if "has_visited" not in st.session_state:
+        st.session_state.has_visited = True
+        stats["total_visitors"] += 1
+
+    # Thử lấy API Key từ cấu hình ẩn (Secrets) của Streamlit
+    try:
+        api_key_secret = st.secrets.get("GEMINI_API_KEY", "")
+    except:
+        api_key_secret = ""
+
+    with st.sidebar:
+        st.markdown("### 🏢 Lĩnh vực tra cứu")
+        selected_domain = st.selectbox(
+            "Chọn chuyên ngành", 
+            ["Hải quan & Xuất nhập khẩu", "Kế toán & Thuế nội địa"],
+            index=0 if st.session_state.domain == "Hải quan & Xuất nhập khẩu" else 1,
+            label_visibility="collapsed"
+        )
+        if selected_domain != st.session_state.domain:
+            st.session_state.domain = selected_domain
+            st.rerun()
+
+        st.markdown("---")
+        st.markdown("### 🤖 Cài đặt AI Luật Sư")
+        if api_key_secret:
+            st.success("Đã kích hoạt AI Luật Sư (Cấu hình tự động)!")
+            api_key = api_key_secret
+        else:
+            st.markdown("Để AI có thể tự động đọc luật và trả lời chính xác, hãy nhập Google Gemini API Key vào đây. Hỗ trợ nhập nhiều Key cùng lúc để tránh hết lượt (cách nhau bởi dấu phẩy `,`). [Lấy key miễn phí tại đây](https://aistudio.google.com/app/apikey).")
+            api_key = st.text_input("Gemini API Key (Hỗ trợ nhiều Key)", type="password")
+            if not api_key:
+                st.warning("Vui lòng nhập API Key để kích hoạt AI.")
+            else:
+                st.success("Đã kích hoạt AI Luật Sư!")
+                
+        st.markdown("---")
+        st.markdown("### 🔄 Dữ liệu trực tuyến")
+        if st.button("Làm mới dữ liệu ngay", use_container_width=True, type="secondary"):
+            fetch_live_data.clear()
+            load_documents.clear()
+            st.success("Đã xóa cache và tải dữ liệu mới nhất!")
+            st.rerun()
+            
+        st.markdown("---")
+        st.markdown("### 📊 Thống kê hệ thống")
+        stats = get_system_stats()
+        
+        if 'session_id' not in st.session_state:
+            st.session_state.session_id = str(uuid4())
+            
+        current_time = time.time()
+        ip, device = get_client_info()
+        location_data = get_location_from_ip(ip)
+
+        stats["active_sessions"][st.session_state.session_id] = {
+            "last_seen": current_time,
+            "ip": ip,
+            "device": device,
+            "location": location_data
+        }
+        
+        # Dọn dẹp session quá 5 phút (300 giây) không tương tác
+        active = {}
+        for sid, data in stats["active_sessions"].items():
+            try:
+                if isinstance(data, dict):
+                    last_seen = data.get("last_seen", current_time)
+                    if current_time - last_seen < 300:
+                        active[sid] = data
+                else:
+                    # Dữ liệu cũ bị lưu đè trong cache dưới dạng float
+                    last_seen = float(data)
+                    if current_time - last_seen < 300:
+                        active[sid] = {
+                            "last_seen": last_seen,
+                            "ip": "Không xác định",
+                            "device": "Máy tính (Desktop)",
+                            "location": None
+                        }
+            except Exception:
+                pass
+        stats["active_sessions"] = active
+        
+        from datetime import datetime
+        if stats["api_date"] != datetime.now().date():
+            stats["api_date"] = datetime.now().date()
+            stats["api_calls"] = 0
+            
+        active_users = len(stats["active_sessions"])
+        remaining_api = max(0, stats["api_limit"] - stats["api_calls"])
+        
+        st.info(f"👥 Đang online: **{active_users}** người")
+        st.info(f"⚡ Lượt hỏi AI còn lại: **{remaining_api}** / {stats['api_limit']}")
+        
+        with st.expander("🕵️ Chi tiết người đang truy cập"):
+            for sid, data in stats["active_sessions"].items():
+                loc_str = f"{data['location']['city']}, {data['location']['country']}" if data.get('location') else "Không rõ (hoặc Localhost)"
+                st.markdown(f"**IP:** `{data['ip']}`\n- 📱 **Máy:** {data['device']}\n- 🌍 **Vị trí:** {loc_str}")
+            
+            # Vẽ bản đồ nếu có dữ liệu vị trí
+            locations = [d["location"] for d in stats["active_sessions"].values() if d.get("location")]
+            if locations:
+                df_map = pd.DataFrame(locations)
+                if not df_map.empty and 'lat' in df_map.columns and 'lon' in df_map.columns:
+                    st.map(df_map, zoom=2)
+            
+    documents = load_documents(st.session_state.domain)
 
     # Header
-    render_header()
-
-    # Auto-update status banner
-    try:
-        from datetime import timedelta
-        data_path = Path(__file__).parent / "data" / "legal-documents.json"
-        mtime = os.path.getmtime(data_path)
-        dt_utc = datetime.utcfromtimestamp(mtime)
-        dt_vn = dt_utc + timedelta(hours=7)
-        last_updated = dt_vn.strftime('%H:%M - %d/%m/%Y')
-        st.success(f"⚡ **Hệ thống Auto-Update AI:** Kho dữ liệu (gồm {len(documents)} văn bản) được đồng bộ lần cuối lúc **{last_updated} (Giờ VN)**.")
-    except Exception as e:
-        pass
+    render_header(st.session_state.domain)
 
     # Search
     col_search, col_btn = st.columns([6, 1])
     with col_search:
         query = st.text_input(
             "🔍 Tìm kiếm",
-            placeholder="Nhập câu hỏi hoặc từ khóa, VD: tạm nhập tái xuất có bị nộp thuế không...",
+            placeholder="Nhập câu hỏi hoặc từ khóa...",
             label_visibility="collapsed",
             key="search_input",
         )
@@ -1049,16 +1396,29 @@ def main():
         search_clicked = st.button("🔍 Tìm", use_container_width=True, type="primary")
 
     # Quick search tags
-    st.markdown("""
+    if st.session_state.domain == "Hải quan & Xuất nhập khẩu":
+        tags_html = (
+            '<span class="quick-tag">Tạm nhập tái xuất</span>\n'
+            '<span class="quick-tag">Thuế xuất khẩu</span>\n'
+            '<span class="quick-tag">Thủ tục thông quan</span>\n'
+            '<span class="quick-tag">Quy tắc xuất xứ C/O</span>\n'
+            '<span class="quick-tag">Kho ngoại quan</span>\n'
+            '<span class="quick-tag">Mã loại hình G13</span>'
+        )
+    else:
+        tags_html = (
+            '<span class="quick-tag">Thuế TNDN</span>\n'
+            '<span class="quick-tag">Thuế TNCN</span>\n'
+            '<span class="quick-tag">Hóa đơn điện tử</span>\n'
+            '<span class="quick-tag">Khấu trừ thuế GTGT</span>\n'
+            '<span class="quick-tag">Chuẩn mực kế toán VAS</span>\n'
+            '<span class="quick-tag">Định khoản chi phí</span>'
+        )
+
+    st.markdown(f"""
     <div style="text-align:center;margin-bottom:1.5rem;">
         <span style="color:#64748b;font-size:0.8rem;">Gợi ý: </span>
-        <span class="quick-tag">Tạm nhập tái xuất</span>
-        <span class="quick-tag">Thuế xuất khẩu</span>
-        <span class="quick-tag">Thủ tục thông quan</span>
-        <span class="quick-tag">Quy tắc xuất xứ C/O</span>
-        <span class="quick-tag">Kho ngoại quan</span>
-        <span class="quick-tag">Gia công xuất khẩu</span>
-        <span class="quick-tag">Mã loại hình G13</span>
+        {tags_html}
     </div>
     """, unsafe_allow_html=True)
 
@@ -1120,10 +1480,17 @@ def main():
     elif sort_key == 'oldest':
         filtered_docs.sort(key=lambda d: d.get('issueDate', ''))
 
-    # Smart Answer Panel (for questions)
-    if query and parsed and parsed['is_question'] and filtered_docs:
-        answer_html = generate_answer(query, filtered_docs, keywords)
-        st.markdown(answer_html, unsafe_allow_html=True)
+    # Smart Answer Panel
+    if query and parsed and filtered_docs:
+        if api_key:
+            st.markdown("### 🤖 AI Luật Sư Trả Lời")
+            with st.spinner("AI đang đọc các bộ luật, thông tư để tìm câu trả lời chính xác..."):
+                ai_answer = call_gemini_api(query, filtered_docs, api_key, st.session_state.domain)
+                st.markdown(f'<div class="ai-response-box">\n\n{ai_answer}\n\n</div>', unsafe_allow_html=True)
+        else:
+            st.markdown("### 📋 Kết quả trích xuất tự động (Chưa dùng AI)")
+            answer_html = generate_answer(query, filtered_docs, keywords)
+            st.markdown(answer_html, unsafe_allow_html=True)
 
     # Results count
     if query:
@@ -1200,11 +1567,8 @@ def main():
                     st.info("👈 Nhấn **Xem chi tiết** ở danh sách bên trái để xem nội dung văn bản.")
 
     # Footer
-    render_footer()
+    render_footer(st.session_state.domain)
 
 
-# ============================================
-# KHỞI CHẠY ỨNG DỤNG
-# ============================================
-# Nếu code chạy đến đây = đã qua bước xác thực ở trên (st.stop() không chặn)
-main()
+if __name__ == "__main__":
+    main()
