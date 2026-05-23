@@ -1234,7 +1234,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_calls"] = 0
         
     last_error = ""
-    # Giai đoạn 1: Vắt kiệt bản PRO trên TẤT CẢ các Key
+    # Giai đoạn 1: Mạnh nhất (Gemini 2.5 Pro + Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
@@ -1246,10 +1246,9 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             return text
         except Exception as e:
             last_error = str(e)
-            # Trượt sang Key tiếp theo thay vì xuống model thấp hơn
             continue
             
-    # Giai đoạn 2: Nếu 100% Key đều hết Quota Pro (hoặc lỗi tool), kích hoạt bản FLASH trên toàn bộ Key
+    # Giai đoạn 2: Nhanh nhạy (Gemini 2.5 Flash + Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
@@ -1262,13 +1261,41 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         except Exception as e:
             last_error = str(e)
             continue
-            
-    # Giai đoạn 3: Lớp bảo vệ cuối cùng
+
+    # Giai đoạn 3: Ổn định (Gemini 1.5 Pro + Search) - Khắc phục lỗi limit 0
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-1.5-pro', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            text = response.text
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+            
+    # Giai đoạn 4: Ổn định & Nhanh (Gemini 1.5 Flash + Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-1.5-flash', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            text = response.text
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+            
+    # Giai đoạn 5: Lớp bảo vệ cuối cùng (Gemini 1.5 Flash KHÔNG Search) - Bất tử
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             text = response.text
             stats["api_calls"] += 1
