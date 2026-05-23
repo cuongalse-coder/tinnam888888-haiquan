@@ -547,6 +547,10 @@ def load_documents(domain):
     except Exception as e:
         pass
         
+    # Sắp xếp toàn bộ văn bản theo ngày ban hành mới nhất (giảm dần)
+    # Văn bản nào không có ngày ban hành thì đẩy xuống cuối
+    docs.sort(key=lambda x: x.get('issueDate') or '1900-01-01', reverse=True)
+    
     return docs
 
 
