@@ -1,6 +1,6 @@
 {
   "last_updated": "2026-05-23T08:00:00+07:00",
-  "total_documents": 75,
+  "total_documents": 76,
   "sources": ["customs.gov.vn", "thuvienphapluat.vn", "vbpl.vn"],
   "documents": [
     {
@@ -1126,7 +1126,21 @@
       "tom_tat": "Cơ chế chứng nhận xuất xứ EVFTA, chứng từ chứng nhận xuất xứ (C/O form EUR.1), chứng từ tự chứng nhận xuất xứ, quy định gửi hàng qua nước thứ ba.",
       "url": "https://thuvienphapluat.vn/",
       "nguon": "thuvienphapluat.vn",
-      "tags": ["C/O", "EVFTA", "EUR.1", "tự chứng nhận xuất xứ"]
+    },
+    {
+      "id": "doc_076",
+      "so_hieu": "99/2025/TT-BTC",
+      "tieu_de": "Thông tư 99/2025/TT-BTC hướng dẫn Chế độ kế toán doanh nghiệp",
+      "loai_van_ban": "Thông tư",
+      "co_quan_ban_hanh": "Bộ Tài chính",
+      "ngay_ban_hanh": "2025-12-31",
+      "ngay_hieu_luc": "2026-01-01",
+      "trang_thai": "Còn hiệu lực",
+      "linh_vuc": "Kế toán - Kiểm toán",
+      "tom_tat": "Thông tư 99/2025/TT-BTC hướng dẫn Chế độ kế toán doanh nghiệp áp dụng đối với các doanh nghiệp hoạt động dưới mọi hình thức sở hữu, được thành lập và hoạt động theo quy định của pháp luật Việt Nam.",
+      "url": "https://m.thuvienphapluat.vn/van-ban/Doanh-nghiep/Thong-tu-99-2025-TT-BTC-huong-dan-Che-do-ke-toan-doanh-nghiep-565484.aspx",
+      "nguon": "thuvienphapluat.vn",
+      "tags": ["kế toán doanh nghiệp", "chế độ kế toán", "thông tư 99"]
     }
   ]
 }
