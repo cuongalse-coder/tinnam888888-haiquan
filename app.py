@@ -1233,7 +1233,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_date"] = get_vn_time().date()
         stats["api_calls"] = 0
         
-       last_error = ""
+    last_error = ""
     # Giai đoạn 1: Vắt kiệt bản PRO trên TẤT CẢ các Key
     for current_key in api_keys:
         if not current_key: continue
