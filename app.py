@@ -1534,13 +1534,13 @@ def main():
         filtered_docs.sort(key=lambda d: d.get('issueDate', ''))
 
     # Smart Answer Panel
-    if query and parsed and filtered_docs:
+    if query and parsed:
         if api_key:
             st.markdown("### 🤖 AI Luật Sư Trả Lời")
             with st.spinner("AI đang đọc các bộ luật, thông tư để tìm câu trả lời chính xác..."):
                 ai_answer = call_gemini_api(query, filtered_docs, api_key, st.session_state.domain)
                 st.markdown(f'<div class="ai-response-box">\n\n{ai_answer}\n\n</div>', unsafe_allow_html=True)
-        else:
+        elif filtered_docs:
             st.markdown("### 📋 Kết quả trích xuất tự động (Chưa dùng AI)")
             answer_html = generate_answer(query, filtered_docs, keywords)
             st.markdown(answer_html, unsafe_allow_html=True)
