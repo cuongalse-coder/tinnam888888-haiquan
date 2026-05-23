@@ -44,56 +44,42 @@ def detect_type(title, number):
     if 'quyết định' in title_lower: return 'quyet-dinh', 'Quyết định'
     return 'cong-van', 'Công văn'
 
-def scrape_mof():
-    """Hàm thu thập văn bản mới từ Bộ Tài Chính / Hải Quan (Mô phỏng cơ chế Scraping)"""
-    new_docs = []
-    current_year = datetime.now().year
-    
-    # Do các trang Chính phủ thường xuyên thay đổi cấu trúc hoặc chặn Bot,
-    # Dưới đây là khung chuẩn (Template) dùng BeautifulSoup. 
-    # Trong thực tế, có thể cần tích hợp Selenium nếu trang dùng CSR (Client-side rendering).
-    
-    url = "https://mof.gov.vn/webcenter/portal/btc/r/m/cvbqp" 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-    }
-    
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'html.parser')
-            # [LOGIC CÀO DỮ LIỆU ĐƯỢC ĐƠN GIẢN HÓA CHO TÍNH TƯƠNG THÍCH]
-            # Giả định lấy được một số văn bản mới nhất
-            pass
-    except Exception as e:
-        logging.error(f"Lỗi khi quét Bộ Tài chính: {e}")
+from utils.scraper import scrape_all_sources
 
-    # --- DỮ LIỆU GIẢ LẬP ĐỂ TEST TÍNH NĂNG TỰ ĐỘNG CHẠY CỦA NĂM HIỆN TẠI ---
-    # Khi cấu trúc HTML web nguồn ổn định, phần này sẽ được thay bằng dữ liệu bóc tách từ soup
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    
-    # Tạo 3 văn bản giả lập để test
-    for i in range(1, 4):
-        mock_doc = {
-            "id": f"tt-test-demo-{current_year}-00{i}",
-            "type": "thong-tu" if i % 2 == 0 else "cong-van",
-            "typeName": "Thông tư" if i % 2 == 0 else "Công văn",
-            "number": f"99{i}/{current_year}/TT-BTC",
-            "title": f"Văn bản tự động lấy từ Bộ Tài Chính (Test Auto-Update số {i})",
-            "issueDate": today_str,
-            "effectiveDate": today_str,
-            "issuingBody": "Bộ Tài chính",
-            "summary": "Văn bản này được sinh ra tự động để kiểm thử cơ chế cào dữ liệu lúc nửa đêm.",
-            "purpose": "Đảm bảo hệ thống luôn có luật mới.",
-            "keyPoints": ["Quy định mới cập nhật", "Tự động hóa", f"Bản test số {i}"],
+def scrape_mof():
+    """Thu thập văn bản mới từ các nguồn thực tế (Hải quan, Thư viện pháp luật, VBPL)"""
+    logging.info("Đang kết nối để cào dữ liệu từ các trang web chính phủ...")
+    try:
+        raw_docs = scrape_all_sources(max_pages=1)
+    except Exception as e:
+        logging.error(f"Lỗi khi cào dữ liệu: {e}")
+        return []
+        
+    new_docs = []
+    for d in raw_docs:
+        # Chuyển đổi định dạng dữ liệu (Schema mapping)
+        doc = {
+            "id": d["id"],
+            "type": d["loai_van_ban"].lower().replace(' ', '-'),
+            "typeName": d["loai_van_ban"],
+            "number": d.get("so_hieu", "N/A"),
+            "title": d["tieu_de"],
+            "issueDate": d.get("ngay_ban_hanh", datetime.now().strftime("%Y-%m-%d")),
+            "effectiveDate": d.get("ngay_hieu_luc", datetime.now().strftime("%Y-%m-%d")),
+            "issuingBody": d.get("co_quan_ban_hanh", "Chính phủ"),
+            "summary": d.get("tom_tat", ""),
+            "purpose": f"Nguồn gốc tự động: {d.get('nguon', 'Internet')}",
+            "keyPoints": ["Văn bản tự động cập nhật từ Internet", "Sử dụng cho tra cứu cơ bản"],
             "articles": [],
-            "content": f"Nội dung văn bản số {i} được hệ thống Robot tự động cào về từ mạng Internet...",
-            "status": "active",
-            "folder": "A",
-            "tags": ["test", "tự động", f"năm {current_year}"],
+            "content": f"VĂN BẢN ĐƯỢC CẬP NHẬT TỰ ĐỘNG\n\nNguồn: {d.get('nguon', 'Internet')}\nLink gốc: {d.get('url', '')}\n\n[TÓM TẮT NỘI DUNG]:\n{d.get('tom_tat', d['tieu_de'])}\n\n(Để đọc toàn văn chi tiết, vui lòng truy cập đường link đính kèm).",
+            "status": "active" if d.get("trang_thai") == "Còn hiệu lực" else "expired",
+            "folder": "Z",
+            "tags": d.get("tags", []),
             "relatedDocs": []
         }
-        new_docs.append(mock_doc)
+        new_docs.append(doc)
+        
+    logging.info(f"Đã chuyển đổi thành công {len(new_docs)} văn bản thực tế.")
     return new_docs
 
 def update_status_old_documents(data):
