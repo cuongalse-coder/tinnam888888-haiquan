@@ -23,6 +23,26 @@ import google.generativeai as genai
 import time
 from uuid import uuid4
 import pandas as pd
+from duckduckgo_search import DDGS
+
+def search_duckduckgo(query, max_results=4):
+    try:
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=max_results))
+            if not results:
+                return "Không tìm thấy kết quả nào trên mạng.", []
+            
+            search_context = ""
+            sources = []
+            for idx, r in enumerate(results):
+                title = r.get('title', 'Nguồn tham khảo')
+                url = r.get('href', '#')
+                body = r.get('body', '')
+                search_context += f"--- Nguồn {idx+1} ---\nTiêu đề: {title}\nĐường dẫn: {url}\nNội dung: {body}\n\n"
+                sources.append({"title": title, "url": url})
+            return search_context, sources
+    except Exception as e:
+        return f"Lỗi tìm kiếm: {str(e)}", []
 # ============================================
 # PAGE CONFIG
 # ============================================
@@ -1234,6 +1254,35 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_calls"] = 0
         
     last_error = ""
+    
+    # Giai đoạn 0: TỰ ĐỘNG CÀO WEB (DuckDuckGo + Gemini 2.5 Flash) - TỶ LỆ THÀNH CÔNG CAO NHẤT
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            # 1. Quét web trước bằng DuckDuckGo
+            search_context, sources = search_duckduckgo(query)
+            
+            # 2. Gắn nội dung web vào Prompt
+            ddg_prompt = prompt + f"\n\n--- DỮ LIỆU THỰC TẾ TỪ INTERNET (BẮT BUỘC SỬ DỤNG) ---\n{search_context}\n"
+            
+            genai.configure(api_key=current_key)
+            # 3. Chạy model offline bình thường (tránh lỗi quota của google_search_retrieval)
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            response = model.generate_content(ddg_prompt)
+            
+            # 4. Gắn nguồn tham khảo
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 0 (DuckDuckGo Search + Gemini 2.5 Flash)*"
+            if sources:
+                text += "\n\n**🔍 Nguồn tham khảo từ Web:**"
+                for src in sources:
+                    text += f"\n- [{src['title']}]({src['url']})"
+                    
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
     # Giai đoạn 1: Trùm cuối Deep Research (CÓ Search)
     for current_key in api_keys:
         if not current_key: continue
