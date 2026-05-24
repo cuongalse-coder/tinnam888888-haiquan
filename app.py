@@ -618,13 +618,8 @@ def load_documents(domain):
             
             # Đưa văn bản mới lên đầu
             docs = new_live_docs + docs
-            
-            if new_live_docs:
-                st.toast(f"✅ Đã kéo {len(new_live_docs)} cập nhật mới từ hệ thống tự động!", icon="🔥")
-        else:
-            st.toast("⚠️ Hệ thống tự động không trả về kết quả nào (Mảng rỗng)", icon="⚠️")
     except Exception as e:
-        st.error(f"Lỗi khi ghép dữ liệu live: {e}")
+        print(f"Lỗi khi ghép dữ liệu live: {e}")
         
     # Sắp xếp toàn bộ văn bản theo ngày ban hành mới nhất (giảm dần)
     # Văn bản nào không có ngày ban hành thì đẩy xuống cuối
