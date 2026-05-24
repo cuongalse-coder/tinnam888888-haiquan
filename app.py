@@ -1248,14 +1248,14 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             last_error = str(e)
             continue
 
-    # Giai đoạn 2: Trùm cuối 3.1 Pro (CÓ Search)
+    # Giai đoạn 2: Trùm cuối 1.5 Pro (CÓ Search - Hỗ trợ API chuẩn)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-3.1-pro-preview', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-1.5-pro', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 3.1 Pro + Search)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 1.5 Pro + Google Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
@@ -1325,7 +1325,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline Thông Minh Tốc Độ)*"
+            text = response.text + f"\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline). (Lý do rớt tầng: {last_error})*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
