@@ -11,4 +11,4 @@ unidecode
 thefuzz
 python-Levenshtein>=0.25.0
 feedparser>=6.0.11
-google-generativeai>=0.4.1
+google-generativeai>=0.8.2
