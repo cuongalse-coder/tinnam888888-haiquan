@@ -429,78 +429,54 @@ div[data-testid="stExpander"] {
 # ============================================
 @st.cache_data(ttl=300)
 def fetch_live_data(domain):
-    """Tự động quét (crawl) các văn bản mới nhất từ các nguồn uy tín."""
+    """Tự động quét (crawl) các văn bản/tin tức mới nhất từ Internet."""
     live_docs = []
     
     if domain == "Hải quan & Xuất nhập khẩu":
-        sources = [
-            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
-            ('HaiQuanOnline', 'https://haiquanonline.com.vn/rss/hai-quan-c4.rss'),
-            ('HaiQuanXNK', 'https://haiquanonline.com.vn/rss/xuat-nhap-khau-c5.rss'),
-        ]
-        keywords = ['hải quan', 'xuất nhập', 'thuế', 'nghị định', 'c/o', 'incoterm', 'biểu thuế', 'xuất xứ']
+        query = "tin tức văn bản hải quan xuất nhập khẩu thuế 2026"
     else:
-        sources = [
-            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
-            ('BaoPhapLuat', 'https://baophapluat.vn/rss/kinh-te-c3.rss'),
-            ('TaiChinh', 'https://tapchitaichinh.vn/rss/ke-toan-kiem-toan.rss'),
-        ]
-        keywords = ['kế toán', 'thuế thu nhập', 'thuế tndn', 'thuế tncn', 'thuế gtgt', 'kiểm toán', 'hóa đơn', 'chứng từ', 'vas', 'chuẩn mực', 'nghị định', 'thông tư']
-    
-    for source_name, url in sources:
-        try:
-            # Thêm timeout 3 giây để tránh bị treo (hang) khi server từ chối IP nước ngoài
-            resp = requests.get(url, timeout=3, headers={'User-Agent': 'Mozilla/5.0'})
-            if resp.status_code != 200:
-                continue
-            feed = feedparser.parse(resp.content)
-            for entry in feed.entries[:30]:
-                title_lower = entry.title.lower()
-                desc_lower = getattr(entry, 'description', '').lower()
-                
-                # Lọc văn bản theo từ khóa
-                if any(kw in title_lower or kw in desc_lower for kw in keywords):
-                    # Lọc tìm số hiệu trong tiêu đề (VD: Nghị định 12/2024/NĐ-CP)
-                    number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', entry.title)
-                    doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
-                    
-                    doc_type = "cong-van"
-                    if 'thông tư' in title_lower: doc_type = "thong-tu"
-                    elif 'nghị định' in title_lower: doc_type = "nghi-dinh"
-                    elif 'quyết định' in title_lower: doc_type = "quyet-dinh"
-                    elif 'nghị quyết' in title_lower: doc_type = "nghi-quyet"
-                    elif 'luật' in title_lower: doc_type = "luat"
-
-                    live_docs.append({
-                        "id": f"live-{source_name}-{len(live_docs)}",
-                        "type": doc_type,
-                        "number": doc_number,
-                        "title": entry.title,
-                        "summary": getattr(entry, 'description', 'Cập nhật tự động từ nguồn ' + source_name),
-                        "issueDate": get_vn_time().strftime('%Y-%m-%d'),
-                        "effectiveDate": "Đang cập nhật",
-                        "issuingBody": f"Nguồn: {source_name}",
-                        "status": "active",
-                        "purpose": "Cập nhật dữ liệu thời gian thực thông qua Crawler.",
-                        "keyPoints": [f"Xem nội dung chi tiết tại bản gốc: {entry.link}"],
-                        "content": f"{entry.title}\n\nĐọc toàn văn tại: {entry.link}",
-                        "articles": [],
-                        "tags": ["cập nhật tự động", "live", doc_type],
-                        "relatedDocs": []
-                    })
-        except Exception as e:
-            continue
-            
-    # Nguồn 2: Tổng cục Hải quan (Web scraping trực tiếp - Basic)
+        query = "tin tức văn bản pháp luật kế toán thuế 2026"
+        
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        # Lấy trang tin tức hoặc điểm văn bản
-        r = requests.get('https://www.customs.gov.vn/index.jsp?pageId=125', headers=headers, timeout=5)
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            # Custom parsing based on customs.gov.vn structure can be added here
-            pass
-    except Exception:
+        with DDGS() as ddgs:
+            # Lấy 15 tin tức/văn bản mới nhất
+            results = list(ddgs.news(query, max_results=15))
+            for idx, entry in enumerate(results):
+                title = entry.get('title', '')
+                
+                # Cố gắng trích xuất số hiệu nếu có
+                number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', title)
+                doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
+                
+                doc_type = "cong-van"
+                title_lower = title.lower()
+                if 'thông tư' in title_lower: doc_type = "thong-tu"
+                elif 'nghị định' in title_lower: doc_type = "nghi-dinh"
+                elif 'quyết định' in title_lower: doc_type = "quyet-dinh"
+                elif 'nghị quyết' in title_lower: doc_type = "nghi-quyet"
+                elif 'luật' in title_lower: doc_type = "luat"
+
+                date_str = entry.get('date', get_vn_time().strftime('%Y-%m-%dT%H:%M:%S'))[:10]
+                source = entry.get('source', 'Internet')
+                
+                live_docs.append({
+                    "id": f"live-ddg-{idx}-{int(time.time())}",
+                    "type": doc_type,
+                    "number": doc_number,
+                    "title": title,
+                    "summary": entry.get('body', 'Cập nhật tự động từ ' + source),
+                    "issueDate": date_str,
+                    "effectiveDate": "",
+                    "issuingBody": source,
+                    "status": "active",
+                    "purpose": "",
+                    "keyPoints": [],
+                    "content": f"Tóm tắt: {entry.get('body', '')}\nNguồn: {source}\nURL: {entry.get('url', '')}",
+                    "articles": [],
+                    "tags": ["Tự động tải", "Mới nhất"],
+                    "relatedDocs": []
+                })
+    except Exception as e:
         pass
 
     return live_docs
