@@ -25,10 +25,12 @@ from uuid import uuid4
 import pandas as pd
 from duckduckgo_search import DDGS
 
-def search_duckduckgo(query, max_results=4):
+def search_duckduckgo(query, max_results=5):
     try:
+        # Ép DuckDuckGo tìm các kết quả mới nhất
+        search_query = query + " cập nhật mới nhất 2026"
         with DDGS() as ddgs:
-            results = list(ddgs.text(query, max_results=max_results))
+            results = list(ddgs.text(search_query, max_results=max_results))
             if not results:
                 return "Không tìm thấy kết quả nào trên mạng.", []
             
