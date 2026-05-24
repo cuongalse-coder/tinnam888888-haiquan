@@ -1239,9 +1239,9 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('deep-research-max-preview-04-2026', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-2.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Deep Research Max + Search)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Gemini 2.5 Flash + Google Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
