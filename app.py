@@ -433,9 +433,9 @@ def fetch_live_data(domain):
     live_docs = []
     
     if domain == "Hải quan & Xuất nhập khẩu":
-        query = "tin tức văn bản hải quan xuất nhập khẩu thuế 2026"
+        query = "hải quan xuất nhập khẩu thuế"
     else:
-        query = "tin tức văn bản pháp luật kế toán thuế 2026"
+        query = "kế toán thuế pháp luật"
         
     try:
         with DDGS() as ddgs:
@@ -477,7 +477,7 @@ def fetch_live_data(domain):
                     "relatedDocs": []
                 })
     except Exception as e:
-        pass
+        print("Lỗi DDG:", e)
 
     return live_docs
 
