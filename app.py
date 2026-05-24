@@ -434,50 +434,92 @@ def fetch_live_data(domain):
     
     if domain == "Hải quan & Xuất nhập khẩu":
         query = "hải quan xuất nhập khẩu thuế"
+        keywords = ['hải quan', 'xuất nhập', 'thuế', 'nghị định', 'thông tư']
     else:
-        query = "kế toán thuế pháp luật"
+        query = "kế toán thuế pháp luật doanh nghiệp"
+        keywords = ['kế toán', 'thuế', 'doanh nghiệp', 'nghị định', 'thông tư']
         
+    # Cách 1: DDGS News
     try:
         with DDGS() as ddgs:
-            # Lấy 15 tin tức/văn bản mới nhất
-            results = list(ddgs.news(query, max_results=15))
+            results = list(ddgs.news(query, max_results=10))
             for idx, entry in enumerate(results):
                 title = entry.get('title', '')
-                
-                # Cố gắng trích xuất số hiệu nếu có
-                number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', title)
-                doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
-                
-                doc_type = "cong-van"
-                title_lower = title.lower()
-                if 'thông tư' in title_lower: doc_type = "thong-tu"
-                elif 'nghị định' in title_lower: doc_type = "nghi-dinh"
-                elif 'quyết định' in title_lower: doc_type = "quyet-dinh"
-                elif 'nghị quyết' in title_lower: doc_type = "nghi-quyet"
-                elif 'luật' in title_lower: doc_type = "luat"
-
-                date_str = entry.get('date', get_vn_time().strftime('%Y-%m-%dT%H:%M:%S'))[:10]
-                source = entry.get('source', 'Internet')
-                
                 live_docs.append({
                     "id": f"live-ddg-{idx}-{int(time.time())}",
-                    "type": doc_type,
-                    "number": doc_number,
+                    "type": "cong-van",
+                    "number": "TIN MỚI",
                     "title": title,
-                    "summary": entry.get('body', 'Cập nhật tự động từ ' + source),
-                    "issueDate": date_str,
+                    "summary": entry.get('body', ''),
+                    "issueDate": entry.get('date', get_vn_time().strftime('%Y-%m-%dT%H:%M:%S'))[:10],
                     "effectiveDate": "",
-                    "issuingBody": source,
+                    "issuingBody": entry.get('source', 'Internet'),
                     "status": "active",
                     "purpose": "",
                     "keyPoints": [],
-                    "content": f"Tóm tắt: {entry.get('body', '')}\nNguồn: {source}\nURL: {entry.get('url', '')}",
+                    "content": f"Tóm tắt: {entry.get('body', '')}\nNguồn: {entry.get('source', '')}\nURL: {entry.get('url', '')}",
                     "articles": [],
-                    "tags": ["Tự động tải", "Mới nhất"],
+                    "tags": ["Tự động tải", "DDG"],
                     "relatedDocs": []
                 })
     except Exception as e:
         print("Lỗi DDG:", e)
+
+    # Cách 2: RSS dự phòng từ VNExpress/BaoChinhPhu (không chặn IP Mỹ)
+    if not live_docs:
+        sources = [
+            ('VNExpress', 'https://vnexpress.net/rss/phap-luat.rss'),
+            ('BaoChinhPhu', 'https://baochinhphu.vn/Rss/kinh-te.rss')
+        ]
+        import feedparser
+        import requests
+        for source_name, url in sources:
+            try:
+                resp = requests.get(url, timeout=5, headers={'User-Agent': 'Mozilla/5.0'})
+                if resp.status_code == 200:
+                    feed = feedparser.parse(resp.content)
+                    for entry in feed.entries[:15]:
+                        title_lower = entry.title.lower()
+                        if any(kw in title_lower for kw in keywords):
+                            live_docs.append({
+                                "id": f"live-rss-{source_name}-{len(live_docs)}",
+                                "type": "cong-van",
+                                "number": "TIN MỚI",
+                                "title": entry.title,
+                                "summary": getattr(entry, 'description', ''),
+                                "issueDate": get_vn_time().strftime('%Y-%m-%d'),
+                                "effectiveDate": "",
+                                "issuingBody": source_name,
+                                "status": "active",
+                                "purpose": "",
+                                "keyPoints": [],
+                                "content": f"{getattr(entry, 'description', '')}\nURL: {getattr(entry, 'link', '')}",
+                                "articles": [],
+                                "tags": ["Tự động tải", "RSS"],
+                                "relatedDocs": []
+                            })
+            except Exception as e:
+                print("Lỗi RSS:", e)
+
+    # Phản hồi UX: Nếu vẫn trống, thông báo cho người dùng biết code ĐÃ chạy
+    if not live_docs:
+        live_docs.append({
+            "id": f"live-empty-{int(time.time())}",
+            "type": "cong-van",
+            "number": "THÔNG BÁO",
+            "title": f"Hệ thống đã quét lúc {get_vn_time().strftime('%H:%M:%S')} nhưng chưa có tin mới",
+            "summary": "Không tìm thấy tin tức nào khớp với từ khóa trong thời điểm hiện tại từ các nguồn mở.",
+            "issueDate": get_vn_time().strftime('%Y-%m-%d'),
+            "effectiveDate": "",
+            "issuingBody": "Hệ thống tự động",
+            "status": "expired",
+            "purpose": "",
+            "keyPoints": [],
+            "content": "Vui lòng chờ vài tiếng nữa để tin tức được cập nhật trên các báo đài.",
+            "articles": [],
+            "tags": ["Hệ thống"],
+            "relatedDocs": []
+        })
 
     return live_docs
 
