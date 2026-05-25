@@ -1318,7 +1318,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             
             genai.configure(api_key=current_key)
             # 3. Chạy model offline bình thường (tránh lỗi quota của google_search_retrieval)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(ddg_prompt)
             
             # 4. Gắn nguồn tham khảo
@@ -1339,7 +1339,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-1.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Gemini 2.5 Flash + Google Search)*"
             stats["api_calls"] += 1
@@ -1395,7 +1395,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-pro-exp-02-05')
+            model = genai.GenerativeModel('gemini-1.5-pro')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 5 (Gemini 3.1 Pro - Bản Offline Suy Luận Mạnh Nhất)*"
             stats["api_calls"] += 1
@@ -1423,7 +1423,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             text = response.text + f"\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline). (Lý do rớt tầng: {last_error})*"
             stats["api_calls"] += 1
@@ -1437,7 +1437,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-1.5-flash-8b')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 8 (Gemini Flash Lite - Bản offline an toàn)*"
             stats["api_calls"] += 1
