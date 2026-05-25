@@ -27,8 +27,8 @@ from duckduckgo_search import DDGS
 
 def search_duckduckgo(query, max_results=5):
     try:
-        # Ép DuckDuckGo tìm các kết quả mới nhất
-        search_query = query + " cập nhật mới nhất 2026"
+        # Tìm kiếm nguyên bản, không thêm chữ rác để tránh làm hỏng kết quả tra cứu số hiệu
+        search_query = query
         with DDGS() as ddgs:
             results = list(ddgs.text(search_query, max_results=max_results))
             if not results:
@@ -1313,6 +1313,10 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             # 1. Quét web trước bằng DuckDuckGo
             search_context, sources = search_duckduckgo(query)
             
+            # Nếu DuckDuckGo không tìm thấy, cố tình báo lỗi để nhường quyền cho Google Search (Tầng 1)
+            if not sources:
+                raise Exception("DuckDuckGo không có kết quả, chuyển sang Google Search")
+                
             # 2. Gắn nội dung web vào Prompt
             ddg_prompt = prompt + f"\n\n--- DỮ LIỆU THỰC TẾ TỪ INTERNET (BẮT BUỘC SỬ DỤNG) ---\n{search_context}\n"
             
