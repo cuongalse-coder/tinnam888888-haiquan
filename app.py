@@ -31,9 +31,9 @@ def search_duckduckgo(query, max_results=5):
         query_lower = query.lower()
         is_legal = any(kw in query_lower for kw in ['thông tư', 'nghị định', 'quyết định', 'nghị quyết', 'luật', 'công văn'])
         
-        # Nếu là pháp luật, ép tìm đúng các trang uy tín của VN
+        # Nếu là pháp luật, thêm tên các trang uy tín vào từ khóa (thay vì dùng site: dễ bị lỗi trên DDG)
         if is_legal:
-            search_query = f'"{query}" site:thuvienphapluat.vn OR site:luatvietnam.vn OR site:chinhphu.vn OR site:haiquanonline.com.vn OR site:customs.gov.vn OR site:mof.gov.vn'
+            search_query = f'{query} thuvienphapluat luatvietnam chinhphu haiquan'
         else:
             search_query = query
 
@@ -1323,26 +1323,21 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         
     last_error = ""
     
-    # Giai đoạn 0: TỰ ĐỘNG CÀO WEB (DuckDuckGo + Gemini 2.5 Flash) - TỶ LỆ THÀNH CÔNG CAO NHẤT
+    # Giai đoạn 0: TỰ ĐỘNG CÀO WEB (DuckDuckGo + Gemini 2.5 Flash) - CỨU CÁNH CHO API FREE
     for current_key in api_keys:
         if not current_key: continue
         try:
-            # 1. Quét web trước bằng DuckDuckGo
             search_context, sources = search_duckduckgo(query)
             
-            # Nếu DuckDuckGo không tìm thấy, cố tình báo lỗi để nhường quyền cho Google Search (Tầng 1)
             if not sources:
-                raise Exception("DuckDuckGo không có kết quả, chuyển sang Google Search")
+                raise Exception("DuckDuckGo không có kết quả")
                 
-            # 2. Gắn nội dung web vào Prompt
             ddg_prompt = prompt + f"\n\n--- DỮ LIỆU THỰC TẾ TỪ INTERNET (BẮT BUỘC SỬ DỤNG) ---\n{search_context}\n"
             
             genai.configure(api_key=current_key)
-            # 3. Chạy model offline bình thường (tránh lỗi quota của google_search_retrieval)
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(ddg_prompt)
             
-            # 4. Gắn nguồn tham khảo
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 0 (DuckDuckGo Search + Gemini 2.5 Flash)*"
             if sources:
                 text += "\n\n**🔍 Nguồn tham khảo từ Web:**"
@@ -1360,7 +1355,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.5-flash', tools='google_search')
+            model = genai.GenerativeModel('gemini-2.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Gemini 2.5 Flash + Google Search)*"
             stats["api_calls"] += 1
@@ -1374,7 +1369,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search')
+            model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 1.5 Pro + Google Search)*"
             stats["api_calls"] += 1
@@ -1388,7 +1383,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-pro-latest', tools='google_search')
+            model = genai.GenerativeModel('gemini-pro-latest', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 3 (Gemini Pro Latest + Search)*"
             stats["api_calls"] += 1
@@ -1402,7 +1397,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-3.5-flash', tools='google_search')
+            model = genai.GenerativeModel('gemini-3.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
             text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 4 (Gemini 3.5 Flash + Search)*"
             stats["api_calls"] += 1
