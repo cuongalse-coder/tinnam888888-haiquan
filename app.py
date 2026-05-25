@@ -27,11 +27,28 @@ from duckduckgo_search import DDGS
 
 def search_duckduckgo(query, max_results=5):
     try:
-        # Tìm kiếm nguyên bản, không thêm chữ rác để tránh làm hỏng kết quả tra cứu số hiệu
-        search_query = query
+        # Nhận diện nếu câu hỏi là về pháp luật (Thông tư, Luật, Nghị định...)
+        query_lower = query.lower()
+        is_legal = any(kw in query_lower for kw in ['thông tư', 'nghị định', 'quyết định', 'nghị quyết', 'luật', 'công văn'])
+        
+        # Nếu là pháp luật, ép tìm đúng các trang uy tín của VN
+        if is_legal:
+            search_query = f'"{query}" site:thuvienphapluat.vn OR site:luatvietnam.vn OR site:chinhphu.vn OR site:haiquanonline.com.vn OR site:customs.gov.vn OR site:mof.gov.vn'
+        else:
+            search_query = query
+
         with DDGS() as ddgs:
             results = list(ddgs.text(search_query, max_results=max_results))
-            if not results:
+            
+            # Nếu DuckDuckGo ra rác (tiếng Anh) hoặc không có, tự đánh rớt
+            valid_results = []
+            for r in results:
+                # Kiểm tra nếu kết quả có chữ tiếng Việt (để loại kết quả như Specsavers UK)
+                text_content = (r.get('title', '') + ' ' + r.get('body', '')).lower()
+                if any(c in text_content for c in ['á', 'à', 'ả', 'ã', 'ạ', 'é', 'è', 'ẻ', 'ẽ', 'ẹ', 'í', 'ì', 'ỉ', 'ĩ', 'ị', 'ó', 'ò', 'ỏ', 'õ', 'ọ', 'ú', 'ù', 'ủ', 'ũ', 'ụ', 'đ']):
+                    valid_results.append(r)
+                    
+            if not valid_results:
                 return "Không tìm thấy kết quả nào trên mạng.", []
             
             search_context = ""
