@@ -194,7 +194,7 @@ with st.sidebar:
     st.divider()
     st.subheader("Bộ Lọc Từ Khóa")
     st.info("Hệ thống sẽ chỉ tải các văn bản có chứa ít nhất một trong các từ khóa này trong tiêu đề.")
-    keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu")
+    keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu hàng hoá")
     keyword_list = [k.strip() for k in keyword_input.split(",") if k.strip()]
 
 if st.button("🔄 Bắt đầu Đồng bộ dữ liệu", type="primary"):
