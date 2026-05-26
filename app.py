@@ -1520,6 +1520,7 @@ def main():
                 
         st.markdown("---")
         st.markdown("### 🔄 Dữ liệu trực tuyến")
+        st.page_link("pages/2_Dong_bo_du_lieu.py", label="Tải Dữ Liệu Tự Động", icon="⬇️")
         if st.button("Làm mới dữ liệu ngay", use_container_width=True, type="secondary"):
             fetch_live_data.clear()
             load_documents.clear()
