@@ -75,7 +75,7 @@ class ThuvienphapluatScraper(BaseScraper):
         self.username = username
         self.password = password
         
-    def sync_new_documents(self, list_url, progress_callback=None):
+    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
         added_count = 0
         try:
             res = self.session.get(list_url)
@@ -86,6 +86,12 @@ class ThuvienphapluatScraper(BaseScraper):
                 if not doc_url: continue
                 if not doc_url.startswith('http'): doc_url = 'https://thuvienphapluat.vn' + doc_url
                 title = a_tag.text.strip()
+                
+                # BỘ LỌC TỪ KHÓA
+                if keywords:
+                    if not any(k.strip().lower() in title.lower() for k in keywords):
+                        continue
+                        
                 if progress_callback: progress_callback(f"[TVPL] Kiểm tra: {title}")
                 if is_downloaded(doc_url): continue
                 doc_res = self.session.get(doc_url)
@@ -100,7 +106,7 @@ class ThuvienphapluatScraper(BaseScraper):
             return False, f"Lỗi TVPL: {str(e)}"
 
 class CustomsScraper(BaseScraper):
-    def sync_new_documents(self, list_url, progress_callback=None):
+    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
         added_count = 0
         try:
             res = self.session.get(list_url, verify=False)
@@ -112,6 +118,12 @@ class CustomsScraper(BaseScraper):
                 if not doc_url.startswith('http'): doc_url = 'https://customs.gov.vn' + doc_url
                 title = a_tag.text.strip()
                 if not title or len(title) < 10: continue
+                
+                # BỘ LỌC TỪ KHÓA
+                if keywords:
+                    if not any(k.strip().lower() in title.lower() for k in keywords):
+                        continue
+                        
                 if progress_callback: progress_callback(f"[Hải Quan] Kiểm tra: {title}")
                 if is_downloaded(doc_url): continue
                 doc_res = self.session.get(doc_url, verify=False)
@@ -126,7 +138,7 @@ class CustomsScraper(BaseScraper):
             return False, f"Lỗi Hải Quan: {str(e)}"
 
 class ChinhphuScraper(BaseScraper):
-    def sync_new_documents(self, list_url, progress_callback=None):
+    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
         added_count = 0
         try:
             res = self.session.get(list_url, verify=False)
@@ -138,6 +150,12 @@ class ChinhphuScraper(BaseScraper):
                 if not doc_url.startswith('http'): doc_url = 'https://xaydungchinhsach.chinhphu.vn' + doc_url
                 title = a_tag.text.strip()
                 if not title: continue
+                
+                # BỘ LỌC TỪ KHÓA
+                if keywords:
+                    if not any(k.strip().lower() in title.lower() for k in keywords):
+                        continue
+                        
                 if progress_callback: progress_callback(f"[Chính Phủ] Kiểm tra: {title}")
                 if is_downloaded(doc_url): continue
                 doc_res = self.session.get(doc_url, verify=False)
@@ -172,6 +190,12 @@ with st.sidebar:
     url_tvpl = st.text_input("Link TVPL", value="https://thuvienphapluat.vn/page/van-ban-moi.aspx")
     url_customs = st.text_input("Link Hải Quan", value="https://www.customs.gov.vn/index.jsp?pageId=127")
     url_chinhphu = st.text_input("Link Chính Phủ", value="https://xaydungchinhsach.chinhphu.vn/toan-van.htm")
+    
+    st.divider()
+    st.subheader("Bộ Lọc Từ Khóa")
+    st.info("Hệ thống sẽ chỉ tải các văn bản có chứa ít nhất một trong các từ khóa này trong tiêu đề.")
+    keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu")
+    keyword_list = [k.strip() for k in keyword_input.split(",") if k.strip()]
 
 if st.button("🔄 Bắt đầu Đồng bộ dữ liệu", type="primary"):
     status_text = st.empty()
@@ -180,13 +204,13 @@ if st.button("🔄 Bắt đầu Đồng bộ dữ liệu", type="primary"):
     results = []
     
     if source_option in ["Tất cả 3 nguồn", "ThuVienPhapLuat.vn"]:
-        success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, update_progress)
+        success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, keyword_list, update_progress)
         results.append(msg)
     if source_option in ["Tất cả 3 nguồn", "Customs.gov.vn"]:
-        success, msg = CustomsScraper().sync_new_documents(url_customs, update_progress)
+        success, msg = CustomsScraper().sync_new_documents(url_customs, keyword_list, update_progress)
         results.append(msg)
     if source_option in ["Tất cả 3 nguồn", "Chinhphu.vn"]:
-        success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, update_progress)
+        success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, keyword_list, update_progress)
         results.append(msg)
 
     progress_bar.progress(100)
