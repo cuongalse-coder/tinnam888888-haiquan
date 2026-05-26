@@ -241,3 +241,43 @@ def render_scraper_ui():
         else: st.info("Chưa có văn bản nào trong cơ sở dữ liệu.")
     except:
         st.error("Chưa thể tải dữ liệu lịch sử.")
+
+    st.divider()
+    st.subheader("🧹 Bảo trì & Làm sạch Dữ liệu")
+    st.info("Tính năng này sẽ rà soát lại toàn bộ văn bản đã tải từ ThuVienPhapLuat trong kho dữ liệu của bạn. Nếu văn bản nào trước đây 'Còn hiệu lực' nhưng nay đã bị chuyển sang 'Hết hiệu lực', nó sẽ bị xóa bỏ.")
+    if st.button("Trạm Dọn Dẹp Văn Bản Hết Hiệu Lực", type="secondary"):
+        cleanup_status = st.empty()
+        cleanup_progress = st.progress(0)
+        
+        try:
+            conn = sqlite3.connect('data/documents.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, url, title FROM downloaded_documents WHERE source_website='thuvienphapluat.vn'")
+            docs = cursor.fetchall()
+            
+            deleted_count = 0
+            total_docs = len(docs)
+            
+            if total_docs == 0:
+                cleanup_status.success("Không có văn bản nào từ TVPL để kiểm tra.")
+            else:
+                scraper = ThuvienphapluatScraper(tvpl_user, tvpl_pass)
+                for i, (doc_id, url, title) in enumerate(docs):
+                    cleanup_status.info(f"⏳ Đang kiểm tra ({i+1}/{total_docs}): {title}")
+                    try:
+                        doc_res = scraper.session.get(url)
+                        doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
+                        page_text = doc_soup.get_text()
+                        if "Tình trạng: Hết hiệu lực" in page_text or "Tình trạng pháp lý: Hết hiệu lực" in page_text:
+                            cursor.execute("DELETE FROM downloaded_documents WHERE id=?", (doc_id,))
+                            conn.commit()
+                            deleted_count += 1
+                    except:
+                        pass
+                    cleanup_progress.progress((i + 1) / total_docs)
+                    time.sleep(0.5)
+                    
+                cleanup_status.success(f"✅ Hoàn tất! Đã phát hiện và xóa vĩnh viễn {deleted_count} văn bản cũ/hết hiệu lực khỏi kho dữ liệu.")
+            conn.close()
+        except Exception as e:
+            st.error(f"Lỗi khi dọn dẹp: {str(e)}")
