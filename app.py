@@ -449,13 +449,6 @@ def fetch_live_data(domain):
     """Tự động quét (crawl) các văn bản mới nhất từ Internet theo yêu cầu."""
     live_docs = []
     
-    doc_keywords = ['nghị định', 'nghị quyết', 'luật', 'công văn', 'quyết định', 'thông tư']
-    
-    if domain == "Hải quan & Xuất nhập khẩu":
-        query = "hải quan xuất nhập khẩu thuế nghị định thông tư quyết định công văn"
-    else:
-        query = "kế toán thuế doanh nghiệp nghị định thông tư quyết định công văn luật"
-        
     # Hàm phụ trợ xác định loại văn bản
     def get_doc_type(title_lower):
         if 'thông tư' in title_lower: return "thong-tu"
@@ -464,98 +457,50 @@ def fetch_live_data(domain):
         if 'nghị quyết' in title_lower: return "nghi-quyet"
         if 'luật' in title_lower: return "luat"
         if 'công văn' in title_lower: return "cong-van"
-        return None
+        return "cong-van"
 
-    # Cách 1: DDGS News
     try:
-        with DDGS() as ddgs:
-            results = list(ddgs.news(query, max_results=20))
-            for idx, entry in enumerate(results):
-                title = entry.get('title', '')
-                summary = entry.get('body', '')
-                title_lower = title.lower()
-                summary_lower = summary.lower()
-                
-                doc_type = get_doc_type(title_lower)
-                
-                # Bắt buộc phải là văn bản pháp luật (có chứa keyword trong tiêu đề hoặc mô tả)
-                if doc_type or any(kw in title_lower for kw in doc_keywords):
-                    if not doc_type: doc_type = "cong-van" # Mặc định
-                    
-                    number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', title)
-                    doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
-                    
-                    live_docs.append({
-                        "id": f"live-ddg-{idx}-{int(time.time())}",
-                        "type": doc_type,
-                        "number": doc_number,
-                        "title": title,
-                        "summary": summary,
-                        "issueDate": entry.get('date', get_vn_time().strftime('%Y-%m-%dT%H:%M:%S'))[:10],
-                        "effectiveDate": "",
-                        "issuingBody": entry.get('source', 'Internet'),
-                        "status": "active",
-                        "purpose": "",
-                        "keyPoints": [],
-                        "content": f"Tóm tắt: {summary}\nNguồn: {entry.get('source', '')}\nURL: {entry.get('url', '')}",
-                        "articles": [],
-                        "tags": ["Tự động tải", "Văn bản mới"],
-                        "relatedDocs": []
-                    })
+        import sqlite3
+        conn = sqlite3.connect('data/documents.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT url, title, source_website, download_date FROM downloaded_documents ORDER BY download_date DESC LIMIT 50")
+        rows = cursor.fetchall()
+        for idx, row in enumerate(rows):
+            url, title, source, download_date = row
+            title_lower = title.lower()
+            doc_type = get_doc_type(title_lower)
+            number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', title)
+            doc_number = number_match.group(1) if number_match else "VĂN BẢN MỚI"
+            
+            live_docs.append({
+                "id": f"db-doc-{idx}-{int(time.time())}",
+                "type": doc_type,
+                "number": doc_number,
+                "title": title,
+                "summary": f"Văn bản tải tự động từ {source}.",
+                "issueDate": download_date[:10] if download_date else get_vn_time().strftime('%Y-%m-%d'),
+                "effectiveDate": "",
+                "issuingBody": source,
+                "status": "active",
+                "purpose": "",
+                "keyPoints": [],
+                "content": f"URL: {url}",
+                "articles": [],
+                "tags": ["Tự động tải", "Văn bản mới"],
+                "relatedDocs": []
+            })
+        conn.close()
     except Exception as e:
-        print("Lỗi DDG:", e)
-
-    # Cách 2: RSS dự phòng từ VNExpress/BaoChinhPhu (không chặn IP Mỹ)
-    if not live_docs:
-        sources = [
-            ('VNExpress', 'https://vnexpress.net/rss/phap-luat.rss'),
-            ('BaoChinhPhu', 'https://baochinhphu.vn/Rss/kinh-te.rss')
-        ]
-        import feedparser
-        import requests
-        for source_name, url in sources:
-            try:
-                resp = requests.get(url, timeout=5, headers={'User-Agent': 'Mozilla/5.0'})
-                if resp.status_code == 200:
-                    feed = feedparser.parse(resp.content)
-                    for entry in feed.entries[:15]:
-                        title_lower = entry.title.lower()
-                        doc_type = get_doc_type(title_lower)
-                        
-                        if doc_type or any(kw in title_lower for kw in doc_keywords):
-                            if not doc_type: doc_type = "cong-van"
-                            
-                            number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', entry.title)
-                            doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
-
-                            live_docs.append({
-                                "id": f"live-rss-{source_name}-{len(live_docs)}",
-                                "type": doc_type,
-                                "number": doc_number,
-                                "title": entry.title,
-                                "summary": getattr(entry, 'description', ''),
-                                "issueDate": get_vn_time().strftime('%Y-%m-%d'),
-                                "effectiveDate": "",
-                                "issuingBody": source_name,
-                                "status": "active",
-                                "purpose": "",
-                                "keyPoints": [],
-                                "content": f"{getattr(entry, 'description', '')}\nURL: {getattr(entry, 'link', '')}",
-                                "articles": [],
-                                "tags": ["Tự động tải", "Văn bản mới"],
-                                "relatedDocs": []
-                            })
-            except Exception as e:
-                print("Lỗi RSS:", e)
-
-    # Phản hồi UX: Nếu vẫn trống, thông báo cho người dùng biết code ĐÃ chạy
+        print("Lỗi đọc DB tự động:", e)
+    
+    # Phản hồi UX: Nếu vẫn trống
     if not live_docs:
         live_docs.append({
             "id": f"live-empty-{int(time.time())}",
             "type": "cong-van",
             "number": "THÔNG BÁO",
-            "title": f"Hệ thống đã quét lúc {get_vn_time().strftime('%H:%M:%S')} nhưng chưa có văn bản/nghị định mới",
-            "summary": "Không tìm thấy văn bản (Nghị định, Nghị quyết, Luật, Công văn, Quyết định) nào mới trong thời điểm hiện tại.",
+            "title": f"Chưa có văn bản tự động nào được tải",
+            "summary": "Vui lòng vào Công cụ Tải Dữ Liệu Tự Động để cập nhật văn bản pháp luật.",
             "issueDate": get_vn_time().strftime('%Y-%m-%d'),
             "effectiveDate": "",
             "issuingBody": "Hệ thống tự động",
