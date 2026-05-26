@@ -1218,6 +1218,28 @@ def render_footer(domain):
     """, unsafe_allow_html=True)
 
 
+def extract_text_from_file(uploaded_file):
+    import io
+    text = ""
+    try:
+        if uploaded_file.name.endswith(".txt"):
+            text = uploaded_file.read().decode("utf-8")
+        elif uploaded_file.name.endswith(".pdf"):
+            import PyPDF2
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.read()))
+            for page in pdf_reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        elif uploaded_file.name.endswith(".docx"):
+            import docx
+            doc = docx.Document(io.BytesIO(uploaded_file.read()))
+            for para in doc.paragraphs:
+                text += para.text + "\n"
+    except Exception as e:
+        print("Lỗi đọc file:", e)
+    return text
+
 def call_gemini_api(query, context_docs, api_key, domain):
     """Sử dụng Gemini API để trả lời câu hỏi pháp lý dựa trên ngữ cảnh."""
     
@@ -1258,6 +1280,16 @@ CÂU HỎI CỦA NGƯỜI DÙNG:
 {query}
 
 TRẢ LỜI CỦA LUẬT SƯ:"""
+
+    user_uploaded_text = ""
+    if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
+        for f in st.session_state.uploaded_files:
+            f.seek(0)
+            text = extract_text_from_file(f)
+            user_uploaded_text += f"\n--- TÀI LIỆU NỘI BỘ MẬT: {f.name} ---\n{text}\n"
+
+    if user_uploaded_text:
+        prompt += f"\n\n--- DỮ LIỆU NỘI BỘ DOANH NGHIỆP CUNG CẤP (ƯU TIÊN TRẢ LỜI DỰA VÀO ĐÂY NẾU CÂU HỎI LIÊN QUAN) ---\n{user_uploaded_text}\n"
 
     api_keys = [k.strip() for k in api_key.split(',')] if ',' in api_key else [api_key.strip()]
     stats = get_system_stats()
@@ -1481,6 +1513,15 @@ def main():
             load_documents.clear()
             st.success("Đã xóa cache và tải dữ liệu mới nhất!")
             st.rerun()
+            
+        st.markdown("---")
+        st.markdown("### 📤 Tải tài liệu nội bộ")
+        st.markdown("<p style='font-size:0.8rem;color:#94a3b8;'>Đẩy công văn, hồ sơ nội bộ cho AI đọc (Hỗ trợ PDF, Word, TXT).</p>", unsafe_allow_html=True)
+        uploaded_files = st.file_uploader("Tải lên bản PDF, Word, TXT", accept_multiple_files=True, type=['pdf', 'txt', 'docx'], label_visibility="collapsed")
+        if uploaded_files:
+            st.session_state.uploaded_files = uploaded_files
+        else:
+            st.session_state.uploaded_files = []
             
         st.markdown("---")
         st.markdown("### 📊 Thống kê hệ thống")
