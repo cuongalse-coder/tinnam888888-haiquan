@@ -75,99 +75,109 @@ class ThuvienphapluatScraper(BaseScraper):
         self.username = username
         self.password = password
         
-    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
+    def sync_new_documents(self, base_url, keywords=[], num_pages=1, only_active=True, progress_callback=None):
         added_count = 0
-        try:
-            res = self.session.get(list_url)
-            soup = BeautifulSoup(res.text, 'html.parser')
-            doc_links = soup.select('a.doc-title') 
-            for a_tag in doc_links:
-                doc_url = a_tag.get('href')
-                if not doc_url: continue
-                if not doc_url.startswith('http'): doc_url = 'https://thuvienphapluat.vn' + doc_url
-                title = a_tag.text.strip()
-                
-                # BỘ LỌC TỪ KHÓA
-                if keywords:
-                    if not any(k.strip().lower() in title.lower() for k in keywords):
+        for page in range(1, num_pages + 1):
+            list_url = f"{base_url}&p={page}" if "?" in base_url else f"{base_url}?p={page}"
+            try:
+                res = self.session.get(list_url)
+                soup = BeautifulSoup(res.text, 'html.parser')
+                doc_links = soup.select('a.doc-title') 
+                for a_tag in doc_links:
+                    doc_url = a_tag.get('href')
+                    if not doc_url: continue
+                    if not doc_url.startswith('http'): doc_url = 'https://thuvienphapluat.vn' + doc_url
+                    title = a_tag.text.strip()
+                    
+                    if keywords and not any(k.strip().lower() in title.lower() for k in keywords):
                         continue
-                        
-                if progress_callback: progress_callback(f"[TVPL] Kiểm tra: {title}")
-                if is_downloaded(doc_url): continue
-                doc_res = self.session.get(doc_url)
-                doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
-                content_div = doc_soup.select_one('.content1') or doc_soup.select_one('#doc-content')
-                if content_div:
-                    self.save_document(doc_url, title, "thuvienphapluat.vn", content_div.get_text(separator="\n", strip=True))
-                    added_count += 1
-                time.sleep(1)
-            return True, f"Đã tải {added_count} bài mới từ ThuVienPhapLuat."
-        except Exception as e:
-            return False, f"Lỗi TVPL: {str(e)}"
+                            
+                    if progress_callback: progress_callback(f"[TVPL - Trang {page}] {title}")
+                    if is_downloaded(doc_url): continue
+                    
+                    doc_res = self.session.get(doc_url)
+                    doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
+                    
+                    # KIỂM TRA HIỆU LỰC
+                    if only_active:
+                        page_text = doc_soup.get_text()
+                        if "Tình trạng: Hết hiệu lực" in page_text or "Tình trạng pháp lý: Hết hiệu lực" in page_text:
+                            continue # Bỏ qua văn bản hết hiệu lực
+                    
+                    content_div = doc_soup.select_one('.content1') or doc_soup.select_one('#doc-content')
+                    if content_div:
+                        self.save_document(doc_url, title, "thuvienphapluat.vn", content_div.get_text(separator="\n", strip=True))
+                        added_count += 1
+                    time.sleep(1)
+            except Exception as e:
+                return False, f"Lỗi TVPL trang {page}: {str(e)}"
+        return True, f"Đã tải {added_count} bài từ ThuVienPhapLuat (Quét {num_pages} trang)."
 
 class CustomsScraper(BaseScraper):
-    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
+    def sync_new_documents(self, base_url, keywords=[], num_pages=1, only_active=True, progress_callback=None):
         added_count = 0
-        try:
-            res = self.session.get(list_url, verify=False)
-            soup = BeautifulSoup(res.text, 'html.parser')
-            doc_links = soup.select('.item-list a, .news-title a') 
-            for a_tag in doc_links:
-                doc_url = a_tag.get('href')
-                if not doc_url: continue
-                if not doc_url.startswith('http'): doc_url = 'https://customs.gov.vn' + doc_url
-                title = a_tag.text.strip()
-                if not title or len(title) < 10: continue
-                
-                # BỘ LỌC TỪ KHÓA
-                if keywords:
-                    if not any(k.strip().lower() in title.lower() for k in keywords):
+        for page in range(1, num_pages + 1):
+            list_url = f"{base_url}&pageIndex={page}" if "?" in base_url else f"{base_url}?pageIndex={page}"
+            try:
+                res = self.session.get(list_url, verify=False)
+                soup = BeautifulSoup(res.text, 'html.parser')
+                doc_links = soup.select('.item-list a, .news-title a') 
+                for a_tag in doc_links:
+                    doc_url = a_tag.get('href')
+                    if not doc_url: continue
+                    if not doc_url.startswith('http'): doc_url = 'https://customs.gov.vn' + doc_url
+                    title = a_tag.text.strip()
+                    if not title or len(title) < 10: continue
+                    
+                    if keywords and not any(k.strip().lower() in title.lower() for k in keywords):
                         continue
-                        
-                if progress_callback: progress_callback(f"[Hải Quan] Kiểm tra: {title}")
-                if is_downloaded(doc_url): continue
-                doc_res = self.session.get(doc_url, verify=False)
-                doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
-                content_div = doc_soup.select_one('.article-content') or doc_soup.select_one('.detail-content')
-                if content_div:
-                    self.save_document(doc_url, title, "customs.gov.vn", content_div.get_text(separator="\n", strip=True))
-                    added_count += 1
-                time.sleep(1)
-            return True, f"Đã tải {added_count} bài mới từ Hải Quan."
-        except Exception as e:
-            return False, f"Lỗi Hải Quan: {str(e)}"
+                            
+                    if progress_callback: progress_callback(f"[Hải Quan - Trang {page}] {title}")
+                    if is_downloaded(doc_url): continue
+                    
+                    doc_res = self.session.get(doc_url, verify=False)
+                    doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
+                    content_div = doc_soup.select_one('.article-content') or doc_soup.select_one('.detail-content')
+                    if content_div:
+                        self.save_document(doc_url, title, "customs.gov.vn", content_div.get_text(separator="\n", strip=True))
+                        added_count += 1
+                    time.sleep(1)
+            except Exception as e:
+                return False, f"Lỗi Hải Quan trang {page}: {str(e)}"
+        return True, f"Đã tải {added_count} bài từ Hải Quan (Quét {num_pages} trang)."
 
 class ChinhphuScraper(BaseScraper):
-    def sync_new_documents(self, list_url, keywords=[], progress_callback=None):
+    def sync_new_documents(self, base_url, keywords=[], num_pages=1, only_active=True, progress_callback=None):
         added_count = 0
-        try:
-            res = self.session.get(list_url, verify=False)
-            soup = BeautifulSoup(res.text, 'html.parser')
-            doc_links = soup.select('.story__title a, .list-vb a')
-            for a_tag in doc_links:
-                doc_url = a_tag.get('href')
-                if not doc_url: continue
-                if not doc_url.startswith('http'): doc_url = 'https://xaydungchinhsach.chinhphu.vn' + doc_url
-                title = a_tag.text.strip()
-                if not title: continue
-                
-                # BỘ LỌC TỪ KHÓA
-                if keywords:
-                    if not any(k.strip().lower() in title.lower() for k in keywords):
+        for page in range(1, num_pages + 1):
+            list_url = f"{base_url}&page={page}" if "?" in base_url else f"{base_url}?page={page}"
+            try:
+                res = self.session.get(list_url, verify=False)
+                soup = BeautifulSoup(res.text, 'html.parser')
+                doc_links = soup.select('.story__title a, .list-vb a')
+                for a_tag in doc_links:
+                    doc_url = a_tag.get('href')
+                    if not doc_url: continue
+                    if not doc_url.startswith('http'): doc_url = 'https://xaydungchinhsach.chinhphu.vn' + doc_url
+                    title = a_tag.text.strip()
+                    if not title: continue
+                    
+                    if keywords and not any(k.strip().lower() in title.lower() for k in keywords):
                         continue
-                        
-                if progress_callback: progress_callback(f"[Chính Phủ] Kiểm tra: {title}")
-                if is_downloaded(doc_url): continue
-                doc_res = self.session.get(doc_url, verify=False)
-                doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
-                content_div = doc_soup.select_one('.detail-content') or doc_soup.select_one('.article-body')
-                if content_div:
-                    self.save_document(doc_url, title, "chinhphu.vn", content_div.get_text(separator="\n", strip=True))
-                    added_count += 1
-                time.sleep(1)
-            return True, f"Đã tải {added_count} bài mới từ Chính Phủ."
-        except Exception as e:
-            return False, f"Lỗi Chính Phủ: {str(e)}"
+                            
+                    if progress_callback: progress_callback(f"[Chính Phủ - Trang {page}] {title}")
+                    if is_downloaded(doc_url): continue
+                    
+                    doc_res = self.session.get(doc_url, verify=False)
+                    doc_soup = BeautifulSoup(doc_res.text, 'html.parser')
+                    content_div = doc_soup.select_one('.detail-content') or doc_soup.select_one('.article-body')
+                    if content_div:
+                        self.save_document(doc_url, title, "chinhphu.vn", content_div.get_text(separator="\n", strip=True))
+                        added_count += 1
+                    time.sleep(1)
+            except Exception as e:
+                return False, f"Lỗi Chính Phủ trang {page}: {str(e)}"
+        return True, f"Đã tải {added_count} bài từ Chính Phủ (Quét {num_pages} trang)."
 
 
 # ==========================================
@@ -192,6 +202,11 @@ def render_scraper_ui():
         url_chinhphu = st.text_input("Link Chính Phủ", value="https://xaydungchinhsach.chinhphu.vn/toan-van.htm")
         
         st.divider()
+        st.subheader("Cài đặt Lịch sử & Hiệu lực")
+        num_pages = st.slider("Số trang lịch sử muốn quét (Mỗi trang ~30 bài)", min_value=1, max_value=50, value=1)
+        only_active = st.checkbox("Chỉ tải văn bản Còn hiệu lực (Bỏ qua Hết hiệu lực - áp dụng TVPL)", value=True)
+        
+        st.divider()
         st.subheader("Bộ Lọc Từ Khóa")
         st.info("Hệ thống sẽ chỉ tải các văn bản có chứa ít nhất một trong các từ khóa này trong tiêu đề.")
         keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu hàng hoá")
@@ -204,13 +219,13 @@ def render_scraper_ui():
         results = []
         
         if source_option in ["Tất cả 3 nguồn", "ThuVienPhapLuat.vn"]:
-            success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, keyword_list, update_progress)
+            success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, keyword_list, num_pages, only_active, update_progress)
             results.append(msg)
         if source_option in ["Tất cả 3 nguồn", "Customs.gov.vn"]:
-            success, msg = CustomsScraper().sync_new_documents(url_customs, keyword_list, update_progress)
+            success, msg = CustomsScraper().sync_new_documents(url_customs, keyword_list, num_pages, only_active, update_progress)
             results.append(msg)
         if source_option in ["Tất cả 3 nguồn", "Chinhphu.vn"]:
-            success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, keyword_list, update_progress)
+            success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, keyword_list, num_pages, only_active, update_progress)
             results.append(msg)
 
         progress_bar.progress(100)
