@@ -1479,6 +1479,14 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
 # MAIN APP
 # ============================================
 def main():
+    if st.session_state.get('show_scraper', False):
+        from scraper_ui import render_scraper_ui
+        if st.sidebar.button("⬅️ Quay lại trang chủ", use_container_width=True):
+            st.session_state.show_scraper = False
+            st.rerun()
+        render_scraper_ui()
+        return
+
     if "domain" not in st.session_state:
         st.session_state.domain = "Hải quan & Xuất nhập khẩu"
         
@@ -1520,7 +1528,9 @@ def main():
                 
         st.markdown("---")
         st.markdown("### 🔄 Dữ liệu trực tuyến")
-        st.page_link("pages/2_Dong_bo_du_lieu.py", label="Tải Dữ Liệu Tự Động", icon="⬇️")
+        if st.button("⬇️ Mở Công Cụ Tải Dữ Liệu Tự Động", use_container_width=True):
+            st.session_state.show_scraper = True
+            st.rerun()
         if st.button("Làm mới dữ liệu ngay", use_container_width=True, type="secondary"):
             fetch_live_data.clear()
             load_documents.clear()

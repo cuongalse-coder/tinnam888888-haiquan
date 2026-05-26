@@ -173,56 +173,56 @@ class ChinhphuScraper(BaseScraper):
 # ==========================================
 # PHẦN 3: GIAO DIỆN STREAMLIT (UI)
 # ==========================================
-init_db()
-
-st.set_page_config(page_title="Đồng bộ Dữ liệu Pháp Luật", page_icon="🔄", layout="wide")
-st.title("🔄 Công Cụ Đồng Bộ Tài Liệu Tự Động")
-st.markdown("Trang này giúp hệ thống tự động cào dữ liệu mới từ 3 nguồn: **ThuVienPhapLuat, Hải Quan, và Chính Phủ**.")
-
-with st.sidebar:
-    st.header("Cài đặt Nguồn cào (Scraper)")
-    source_option = st.selectbox("Chọn nguồn muốn đồng bộ", [
-        "Tất cả 3 nguồn", "ThuVienPhapLuat.vn", "Customs.gov.vn", "Chinhphu.vn"
-    ])
-    st.divider()
-    tvpl_user = st.text_input("Tài khoản TVPL", value="cuong8791")
-    tvpl_pass = st.text_input("Mật khẩu TVPL", type="password", value="02052016")
-    url_tvpl = st.text_input("Link TVPL", value="https://thuvienphapluat.vn/page/van-ban-moi.aspx")
-    url_customs = st.text_input("Link Hải Quan", value="https://www.customs.gov.vn/index.jsp?pageId=127")
-    url_chinhphu = st.text_input("Link Chính Phủ", value="https://xaydungchinhsach.chinhphu.vn/toan-van.htm")
+def render_scraper_ui():
+    init_db()
     
-    st.divider()
-    st.subheader("Bộ Lọc Từ Khóa")
-    st.info("Hệ thống sẽ chỉ tải các văn bản có chứa ít nhất một trong các từ khóa này trong tiêu đề.")
-    keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu hàng hoá")
-    keyword_list = [k.strip() for k in keyword_input.split(",") if k.strip()]
-
-if st.button("🔄 Bắt đầu Đồng bộ dữ liệu", type="primary"):
-    status_text = st.empty()
-    progress_bar = st.progress(0)
-    def update_progress(msg): status_text.info(f"⏳ {msg}")
-    results = []
+    st.title("🔄 Công Cụ Đồng Bộ Tài Liệu Tự Động")
+    st.markdown("Trang này giúp hệ thống tự động cào dữ liệu mới từ 3 nguồn: **ThuVienPhapLuat, Hải Quan, và Chính Phủ**.")
     
-    if source_option in ["Tất cả 3 nguồn", "ThuVienPhapLuat.vn"]:
-        success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, keyword_list, update_progress)
-        results.append(msg)
-    if source_option in ["Tất cả 3 nguồn", "Customs.gov.vn"]:
-        success, msg = CustomsScraper().sync_new_documents(url_customs, keyword_list, update_progress)
-        results.append(msg)
-    if source_option in ["Tất cả 3 nguồn", "Chinhphu.vn"]:
-        success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, keyword_list, update_progress)
-        results.append(msg)
+    with st.sidebar:
+        st.header("Cài đặt Nguồn cào (Scraper)")
+        source_option = st.selectbox("Chọn nguồn muốn đồng bộ", [
+            "Tất cả 3 nguồn", "ThuVienPhapLuat.vn", "Customs.gov.vn", "Chinhphu.vn"
+        ])
+        st.divider()
+        tvpl_user = st.text_input("Tài khoản TVPL", value="cuong8791")
+        tvpl_pass = st.text_input("Mật khẩu TVPL", type="password", value="02052016")
+        url_tvpl = st.text_input("Link TVPL", value="https://thuvienphapluat.vn/page/van-ban-moi.aspx")
+        url_customs = st.text_input("Link Hải Quan", value="https://www.customs.gov.vn/index.jsp?pageId=127")
+        url_chinhphu = st.text_input("Link Chính Phủ", value="https://xaydungchinhsach.chinhphu.vn/toan-van.htm")
+        
+        st.divider()
+        st.subheader("Bộ Lọc Từ Khóa")
+        st.info("Hệ thống sẽ chỉ tải các văn bản có chứa ít nhất một trong các từ khóa này trong tiêu đề.")
+        keyword_input = st.text_input("Từ khóa (cách nhau bằng dấu phẩy):", value="kế toán, hải quan, c/o, biểu thuế, xuất nhập khẩu hàng hoá")
+        keyword_list = [k.strip() for k in keyword_input.split(",") if k.strip()]
 
-    progress_bar.progress(100)
-    for r in results: st.success(r)
+    if st.button("🔄 Bắt đầu Đồng bộ dữ liệu", type="primary"):
+        status_text = st.empty()
+        progress_bar = st.progress(0)
+        def update_progress(msg): status_text.info(f"⏳ {msg}")
+        results = []
+        
+        if source_option in ["Tất cả 3 nguồn", "ThuVienPhapLuat.vn"]:
+            success, msg = ThuvienphapluatScraper(tvpl_user, tvpl_pass).sync_new_documents(url_tvpl, keyword_list, update_progress)
+            results.append(msg)
+        if source_option in ["Tất cả 3 nguồn", "Customs.gov.vn"]:
+            success, msg = CustomsScraper().sync_new_documents(url_customs, keyword_list, update_progress)
+            results.append(msg)
+        if source_option in ["Tất cả 3 nguồn", "Chinhphu.vn"]:
+            success, msg = ChinhphuScraper().sync_new_documents(url_chinhphu, keyword_list, update_progress)
+            results.append(msg)
 
-st.divider()
-st.subheader("Lịch sử các văn bản đã tải")
-try:
-    conn = sqlite3.connect('data/documents.db')
-    df = pd.read_sql_query("SELECT source_website, title, download_date, url FROM downloaded_documents ORDER BY download_date DESC", conn)
-    conn.close()
-    if not df.empty: st.dataframe(df, use_container_width=True)
-    else: st.info("Chưa có văn bản nào trong cơ sở dữ liệu.")
-except:
-    st.error("Chưa thể tải dữ liệu lịch sử.")
+        progress_bar.progress(100)
+        for r in results: st.success(r)
+
+    st.divider()
+    st.subheader("Lịch sử các văn bản đã tải")
+    try:
+        conn = sqlite3.connect('data/documents.db')
+        df = pd.read_sql_query("SELECT source_website, title, download_date, url FROM downloaded_documents ORDER BY download_date DESC", conn)
+        conn.close()
+        if not df.empty: st.dataframe(df, use_container_width=True)
+        else: st.info("Chưa có văn bản nào trong cơ sở dữ liệu.")
+    except:
+        st.error("Chưa thể tải dữ liệu lịch sử.")
