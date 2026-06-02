@@ -1561,7 +1561,31 @@ TRẢ LỜI CỦA CHUYÊN GIA HẢI QUAN:"""
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-3.1-pro-preview')
             response = model.generate_content(prompt)
-            return response.text + "\n\n*(Lưu ý: Phản hồi này được tạo bởi Trợ lý Offline do API Search tạm thời gián đoạn)*"
+            return response.text + "\n\n*(Lưu ý: Phản hồi này được tạo bởi Trợ lý Offline do API Search hoặc mẫu Pro tạm thời quá tải)*"
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # 5. Tốc độ cao 2.5 Flash (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            response = model.generate_content(prompt)
+            return response.text + "\n\n*(Lưu ý: Phản hồi này được tạo bởi Trợ lý Offline (Gemini 2.5 Flash) do API Search hoặc mẫu Pro tạm thời quá tải)*"
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # 6. Bảo vệ cuối cùng 1.5 Flash (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            response = model.generate_content(prompt)
+            return response.text + "\n\n*(Lưu ý: Phản hồi này được tạo bởi Trợ lý Offline (Gemini 1.5 Flash) do API Search hoặc mẫu Pro tạm thời quá tải)*"
         except Exception as e:
             last_error = str(e)
             continue
