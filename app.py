@@ -1358,6 +1358,259 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         return f"Lỗi khi kết nối với AI Trợ lý: {last_error}. Vui lòng kiểm tra lại cấu hình API Key."
 
 
+def classify_solder_product(product_type, silver_pct, flux_pct, solvent_pct=0):
+    """
+    Phân loại mã HS tự động cho sản phẩm hàn (Kem hàn / Dây hàn)
+    Dựa trên quy tắc hải quan Việt Nam và Chú giải chi tiết HS (WCO Explanatory Notes).
+    """
+    reasoning = []
+    hs_code = ""
+    
+    if product_type == "Kem hàn (Solder Paste)":
+        hs_code = "3810.10.00"
+        reasoning.append("Sản phẩm là chế phẩm dạng bột nhão (paste) chứa bột kim loại phối trộn với các chất phi kim (chất trợ dung và dung môi).")
+        reasoning.append(f"Thành phần chi tiết: Bạc (Ag) chiếm <mark>{silver_pct}%</mark>, Chất trợ dung chiếm <mark>{flux_pct}%</mark>, Dung môi chiếm <mark>{solvent_pct}%</mark>.")
+        reasoning.append("Theo Chú giải chi tiết nhóm 38.10 (WCO Explanatory Notes), các bột và bột nhão dùng để hàn gồm bột kim loại (kể cả kim loại quý như Bạc) phối trộn với các chất khác (như flux, dung môi...) được phân loại vào nhóm 38.10 <strong>bất kể hàm lượng kim loại quý là bao nhiêu</strong>.")
+        reasoning.append("Kết luận: Mã HS phù hợp nhất là <mark>3810.10.00</mark> (Chế phẩm bột và bột nhão gồm kim loại và các vật liệu khác dùng để hàn).")
+
+    elif product_type == "Dây hàn (Solder Wire)":
+        alloy_weight = 100 - flux_pct
+        if alloy_weight <= 0:
+            return "Lỗi dữ liệu", ["Vui lòng kiểm tra lại tỷ lệ chất trợ dung (< 100%)."]
+            
+        silver_in_alloy = (silver_pct / alloy_weight) * 100
+        
+        reasoning.append(f"Sản phẩm là dây hàn lõi thuốc (chứa chất trợ dung <mark>{flux_pct}%</mark> và hợp kim kim loại chiếm <mark>{alloy_weight}%</mark>).")
+        reasoning.append(f"Quy đổi hàm lượng Bạc (Ag) riêng trong phần hợp kim kim loại: ({silver_pct}% / {alloy_weight}%) × 100 = <strong>{silver_in_alloy:.2f}%</strong>.")
+        
+        if silver_in_alloy >= 2.0:
+            hs_code = "7106.92.00"
+            reasoning.append(f"<strong>Chú giải 5 Chương 71:</strong> Vì hàm lượng Bạc trong hợp kim đạt <strong>{silver_in_alloy:.2f}%</strong> (từ 2% trở lên), sản phẩm được coi là 'Hợp kim của kim loại quý (bạc)'.")
+            reasoning.append("<strong>Chú giải loại trừ nhóm 83.11:</strong> Dây hàn có phần hợp kim chứa từ 2% trở lên theo trọng lượng của bất kỳ kim loại quý nào bị LOẠI TRỪ khỏi nhóm 83.11 và bắt buộc phải phân loại vào Chương 71.")
+            reasoning.append("Kết luận: Mã HS phù hợp nhất là <mark>7106.92.00</mark> (Bạc ở dạng bán thành phẩm - dạng dây hợp kim).")
+        else:
+            hs_code = "8311.30.00"
+            reasoning.append(f"<strong>Chú giải 5 Chương 71:</strong> Vì hàm lượng Bạc trong hợp kim chỉ đạt <strong>{silver_in_alloy:.2f}%</strong> (< 2%), sản phẩm KHÔNG được coi là hợp kim của kim loại quý.")
+            reasoning.append("<strong>Chú giải nhóm 83.11:</strong> Sản phẩm là dây từ kim loại cơ bản có lõi chất trợ dung dùng để hàn bằng ngọn lửa, thuộc nhóm 83.11.")
+            reasoning.append("Kết luận: Mã HS phù hợp nhất là <mark>8311.30.00</mark> (Dây có lõi bằng kim loại cơ bản dùng để hàn).")
+            
+    return hs_code, reasoning
+
+
+def call_hs_classifier_api(product_desc, api_key):
+    """Sử dụng Gemini API kết nối Internet để phân loại mã HS 2022 chuẩn xác nhất."""
+    import google.generativeai as genai
+    
+    prompt = f"""Bạn là một chuyên gia phân tích phân loại hải quan cấp cao của Tổng cục Hải quan Việt Nam, cực kỳ am hiểu Danh mục hàng hóa xuất nhập khẩu Việt Nam ban hành kèm theo Thông tư 31/2022/TT-BTC (phiên bản HS 2022) và 6 quy tắc tổng quát giải thích mã HS.
+
+Nhiệm vụ của bạn là phân loại mã HS và giải thích cơ sở pháp lý cho sản phẩm sau đây:
+TÊN/MÔ TẢ SẢN PHẨM: "{product_desc}"
+
+MỆNH LỆNH BẮT BUỘC:
+1. Bạn phải sử dụng CÔNG CỤ TÌM KIẾM GOOGLE (Search tool) để tìm kiếm chính xác mã HS 8 chữ số của sản phẩm này trong Biểu thuế XNK Việt Nam 2022 (Thông tư 31/2022/TT-BTC).
+2. Trả lời cực kỳ chuyên nghiệp theo mẫu giải trình hải quan, bao gồm:
+   - MÃ HS CODE ĐỀ XUẤT (8 chữ số theo HS 2022).
+   - THUẾ SUẤT THAM KHẢO (Thuế nhập khẩu ưu đãi MFN, Thuế GTGT VAT).
+   - CƠ SỞ PHÁP LÝ (Trích dẫn cụ thể Quy tắc tổng quát nào từ 1 đến 6, Chú giải pháp lý của Phần nào, Chương nào, hoặc Chú giải chi tiết nhóm nào).
+   - LẬP LUẬN PHÂN TÍCH (Giải thích tại sao sản phẩm lại thuộc nhóm đó, phân tích các thành phần cấu tạo hoặc công dụng để loại trừ các chương khác).
+
+ĐỊNH DẠNG TRÌNH BÀY BẮT BUỘC:
+- Các thông tin quan trọng như MÃ HS, THUẾ SUẤT, QUY TẮC, ĐIỀU LUẬT bắt buộc phải bọc trong thẻ HTML <mark>nội dung</mark> để bôi vàng nổi bật (Ví dụ: <mark>3810.10.00</mark>, <mark>Quy tắc 1</mark>, <mark>Thông tư 31/2022/TT-BTC</mark>).
+- Sử dụng danh sách gạch đầu dòng (bullet points) để mạch lạc. TUYỆT ĐỐI KHÔNG DÙNG BẢNG (TABLE) vì sẽ bị lỗi hiển thị.
+- Trình bày rõ ràng, chuyên nghiệp, khiêm tốn nhưng cực kỳ chắc chắn về mặt pháp lý.
+
+TRẢ LỜI CỦA CHUYÊN GIA HẢI QUAN:"""
+
+    api_keys = [k.strip() for k in api_key.split(',')] if ',' in api_key else [api_key.strip()]
+    last_error = ""
+    
+    # 1. Trùm cuối 3.1 Pro (CÓ Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-3.1-pro-preview', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # 2. Trùm cuối Pro Latest (CÓ Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-pro-latest', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # 3. Mạnh nhất 3.5 Flash (CÓ Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-3.5-flash', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # 4. Trùm cuối 3.1 Pro (KHÔNG Search)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-3.1-pro-preview')
+            response = model.generate_content(prompt)
+            return response.text + "\n\n*(Lưu ý: Phản hồi này được tạo bởi Trợ lý Offline do API Search tạm thời gián đoạn)*"
+        except Exception as e:
+            last_error = str(e)
+            continue
+            
+    return f"⚠️ **Lỗi kết nối AI:** {last_error}. Vui lòng kiểm tra lại cấu hình API Key ở sidebar."
+
+
+def render_hs_tool(api_key):
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 1px solid #4338ca; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);">
+        <h2 style="color: #fff; font-size: 1.6rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            🔬 TRỢ LÝ PHÂN LOẠI MÃ HS CODE VIỆT NAM (HS 2022)
+        </h2>
+        <p style="color: #c7d2fe; margin-top: 0.5rem; font-size: 0.95rem;">
+            Giải pháp tra cứu và áp mã HS tự động theo Danh mục XNK Việt Nam (Thông tư 31/2022/TT-BTC) kết hợp Chú giải pháp lý của Tổ chức Hải quan Thế giới (WCO).
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    tab_universal, tab_quick_solder = st.tabs([
+        "🔍 Tra cứu & Phân loại HS Toàn Diện (Trí tuệ nhân tạo AI)", 
+        "⚙️ Công cụ Phân loại nhanh Kem/Dây Hàn"
+    ])
+
+    with tab_universal:
+        st.markdown("""
+        <div style="background: #1e293b; padding: 1.2rem; border-radius: 12px; border: 1px solid #334155; margin-bottom: 1.5rem;">
+            <h3 style="color: #a5b4fc; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                🤖 AI Phân Loại & Giải Trình Mã HS Toàn Diện (HS 2022)
+            </h3>
+            <p style="color: #94a3b8; font-size: 0.82rem; margin-top: 0.3rem; margin-bottom: 0;">
+                Nhập tên hàng hóa chi tiết (kèm cấu tạo, công dụng hoặc vật liệu cấu thành) để AI tự động tra cứu, áp mã 8 chữ số và lập luận pháp lý theo Thông tư 31/2022/TT-BTC.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        prod_desc = st.text_area(
+            "Mô tả chi tiết sản phẩm / hàng hóa cần áp mã HS:", 
+            placeholder="Ví dụ: Máy pha cà phê Espresso dùng cho văn phòng, công suất 1450W, có vòi đánh sữa bằng thép không gỉ...",
+            key="universal_prod_desc",
+            height=100
+        )
+        
+        btn_ai_analyze = st.button("🚀 Bắt đầu Phân Tích & Xác Định Mã HS bằng AI", use_container_width=True, type="primary")
+        
+        if btn_ai_analyze:
+            if not api_key:
+                st.warning("⚠️ **Vui lòng nhập Google Gemini API Key ở sidebar bên trái để kích hoạt Trợ lý AI phân loại HS.**")
+            elif not prod_desc.strip():
+                st.error("❌ Vui lòng nhập mô tả hàng hóa trước khi tiến hành phân tích.")
+            else:
+                with st.spinner("AI đang tiến hành quét dữ liệu Biểu thuế Việt Nam 2022, Chú giải chương và lập luận giải trình..."):
+                    ai_result = call_hs_classifier_api(prod_desc, api_key)
+                    st.markdown(f'<div class="ai-response-box">\n\n{ai_result}\n\n</div>', unsafe_allow_html=True)
+                    st.success("✅ Phân tích hoàn tất! Bạn có thể lưu lại lập luận trên để bổ sung vào bộ hồ sơ kiểm tra sau thông quan.")
+
+    with tab_quick_solder:
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            st.markdown("""
+            <div style="background: #1e293b; padding: 1.2rem; border-radius: 12px; border: 1px solid #334155; margin-bottom: 1rem;">
+                <h3 style="color: #a5b4fc; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    📝 Nhập Thông Tin Thành Phần
+                </h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            prod_type = st.selectbox(
+                "1. Chọn loại sản phẩm", 
+                ["Kem hàn (Solder Paste)", "Dây hàn (Solder Wire)"],
+                key="hs_prod_type"
+            )
+            
+            silver = st.number_input(
+                "2. Hàm lượng Bạc - Ag (%)", 
+                min_value=0.0, 
+                max_value=100.0, 
+                value=2.3, 
+                step=0.1,
+                key="hs_silver"
+            )
+            
+            flux = st.number_input(
+                "3. Hàm lượng Chất trợ dung - Flux (%)", 
+                min_value=0.0, 
+                max_value=100.0, 
+                value=12.0, 
+                step=0.1,
+                key="hs_flux"
+            )
+            
+            solvent = 0.0
+            if prod_type == "Kem hàn (Solder Paste)":
+                solvent = st.number_input(
+                    "4. Hàm lượng Dung môi - Solvent (%)", 
+                    min_value=0.0, 
+                    max_value=100.0, 
+                    value=2.5, 
+                    step=0.1,
+                    key="hs_solvent"
+                )
+                
+            st.markdown("<br>", unsafe_allow_html=True)
+            btn_analyze = st.button("🚀 Bắt đầu Phân Tích & Đối Chiếu Luật", use_container_width=True, type="primary")
+
+        with col2:
+            if btn_analyze:
+                hs, steps = classify_solder_product(prod_type, silver, flux, solvent)
+                
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); padding: 1.8rem; border-radius: 12px; border: 2px solid #059669; box-shadow: 0 8px 25px rgba(5, 150, 105, 0.2); text-align: center;">
+                    <div style="font-size: 1rem; color: #a7f3d0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">MÃ HS CODE ĐỀ XUẤT</div>
+                    <div style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-top: 0.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">{hs}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                st.markdown("""
+                <div style="background: #0f172a; padding: 1.2rem; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 1rem;">
+                    <h3 style="color: #fbbf24; font-size: 1.1rem; margin: 0;">⚖️ Lập Luận Giải Trình Pháp Lý</h3>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                for i, step in enumerate(steps, 1):
+                    st.markdown(f"""
+                    <div class="answer-item" style="border-left-color: #fbbf24; margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; color: #e2e8f0; background: rgba(255, 255, 255, 0.02); padding: 0.8rem 1.2rem; border-radius: 8px;">
+                        <span style="color: #fbbf24; font-weight: bold; font-size: 1.05rem;">{i}.</span> {step}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                st.success("✅ Bạn có thể copy phần giải trình pháp lý này để dán vào hồ sơ hải quan hoặc công văn giải trình kiểm tra sau thông quan.")
+            else:
+                st.markdown("""
+                <div style="background: rgba(30, 41, 59, 0.3); border: 2px dashed #475569; border-radius: 12px; height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; color: #94a3b8;">
+                    <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔬</div>
+                    <h3 style="color: #cbd5e1; font-size: 1.2rem; font-weight: 600; margin: 0;">Sẵn sàng Phân Tích</h3>
+                    <p style="margin-top: 0.5rem; max-width: 320px; font-size: 0.85rem; line-height: 1.5;">Hãy nhập đầy đủ thông số thành phần và bấm nút "Bắt đầu Phân Tích" ở bên trái để xem kết quả mã HS và lập luận giải trình.</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+
 # ============================================
 # MAIN APP
 # ============================================
@@ -1387,6 +1640,14 @@ def main():
         if selected_domain != st.session_state.domain:
             st.session_state.domain = selected_domain
             st.rerun()
+
+        st.markdown("---")
+        st.markdown("### 🛠️ Chức năng")
+        app_mode = st.selectbox(
+            "Chọn chức năng",
+            ["📚 Tra cứu Luật & Văn bản", "🔬 Trợ lý Phân loại Mã HS 2022 (AI)"],
+            key="app_mode"
+        )
 
         st.markdown("---")
         st.markdown("### 🤖 Cài đặt AI Luật Sư")
@@ -1476,6 +1737,12 @@ def main():
 
     # Header
     render_header(st.session_state.domain)
+
+    # Stop rendering the main page if the user is in HS Tool mode
+    if app_mode == "🔬 Trợ lý Phân loại Mã HS 2022 (AI)":
+        render_hs_tool(api_key)
+        render_footer(st.session_state.domain)
+        st.stop()
 
     # Search
     col_search, col_btn = st.columns([6, 1])
