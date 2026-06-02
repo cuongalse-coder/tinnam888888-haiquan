@@ -23,6 +23,45 @@ import google.generativeai as genai
 import time
 from uuid import uuid4
 import pandas as pd
+from duckduckgo_search import DDGS
+
+def search_duckduckgo(query, max_results=5):
+    try:
+        # Nhận diện nếu câu hỏi là về pháp luật (Thông tư, Luật, Nghị định...)
+        query_lower = query.lower()
+        is_legal = any(kw in query_lower for kw in ['thông tư', 'nghị định', 'quyết định', 'nghị quyết', 'luật', 'công văn'])
+        
+        # Nếu là pháp luật, thêm tên các trang uy tín vào từ khóa (thay vì dùng site: dễ bị lỗi trên DDG)
+        if is_legal:
+            search_query = f'{query} thuvienphapluat luatvietnam chinhphu haiquan'
+        else:
+            search_query = query
+
+        with DDGS() as ddgs:
+            results = list(ddgs.text(search_query, max_results=max_results))
+            
+            # Nếu DuckDuckGo ra rác (tiếng Anh) hoặc không có, tự đánh rớt
+            valid_results = []
+            for r in results:
+                # Kiểm tra nếu kết quả có chữ tiếng Việt (để loại kết quả như Specsavers UK)
+                text_content = (r.get('title', '') + ' ' + r.get('body', '')).lower()
+                if any(c in text_content for c in ['á', 'à', 'ả', 'ã', 'ạ', 'é', 'è', 'ẻ', 'ẽ', 'ẹ', 'í', 'ì', 'ỉ', 'ĩ', 'ị', 'ó', 'ò', 'ỏ', 'õ', 'ọ', 'ú', 'ù', 'ủ', 'ũ', 'ụ', 'đ']):
+                    valid_results.append(r)
+                    
+            if not valid_results:
+                return "Không tìm thấy kết quả nào trên mạng.", []
+            
+            search_context = ""
+            sources = []
+            for idx, r in enumerate(results):
+                title = r.get('title', 'Nguồn tham khảo')
+                url = r.get('href', '#')
+                body = r.get('body', '')
+                search_context += f"--- Nguồn {idx+1} ---\nTiêu đề: {title}\nĐường dẫn: {url}\nNội dung: {body}\n\n"
+                sources.append({"title": title, "url": url})
+            return search_context, sources
+    except Exception as e:
+        return f"Lỗi tìm kiếm: {str(e)}", []
 # ============================================
 # PAGE CONFIG
 # ============================================
@@ -407,79 +446,72 @@ div[data-testid="stExpander"] {
 # ============================================
 @st.cache_data(ttl=300)
 def fetch_live_data(domain):
-    """Tự động quét (crawl) các văn bản mới nhất từ các nguồn uy tín."""
+    """Tự động quét (crawl) các văn bản mới nhất từ Internet theo yêu cầu."""
     live_docs = []
     
-    if domain == "Hải quan & Xuất nhập khẩu":
-        sources = [
-            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
-            ('HaiQuanOnline', 'https://haiquanonline.com.vn/rss/hai-quan-c4.rss'),
-            ('HaiQuanXNK', 'https://haiquanonline.com.vn/rss/xuat-nhap-khau-c5.rss'),
-        ]
-        keywords = ['hải quan', 'xuất nhập', 'thuế', 'nghị định', 'c/o', 'incoterm', 'biểu thuế', 'xuất xứ']
-    else:
-        sources = [
-            ('LuatVietnam', 'https://luatvietnam.vn/tin-phap-luat.rss'),
-            ('BaoPhapLuat', 'https://baophapluat.vn/rss/kinh-te-c3.rss'),
-            ('TaiChinh', 'https://tapchitaichinh.vn/rss/ke-toan-kiem-toan.rss'),
-        ]
-        keywords = ['kế toán', 'thuế thu nhập', 'thuế tndn', 'thuế tncn', 'thuế gtgt', 'kiểm toán', 'hóa đơn', 'chứng từ', 'vas', 'chuẩn mực', 'nghị định', 'thông tư']
-    
-    for source_name, url in sources:
-        try:
-            # Thêm timeout 3 giây để tránh bị treo (hang) khi server từ chối IP nước ngoài
-            resp = requests.get(url, timeout=3, headers={'User-Agent': 'Mozilla/5.0'})
-            if resp.status_code != 200:
-                continue
-            feed = feedparser.parse(resp.content)
-            for entry in feed.entries[:30]:
-                title_lower = entry.title.lower()
-                desc_lower = getattr(entry, 'description', '').lower()
-                
-                # Lọc văn bản theo từ khóa
-                if any(kw in title_lower or kw in desc_lower for kw in keywords):
-                    # Lọc tìm số hiệu trong tiêu đề (VD: Nghị định 12/2024/NĐ-CP)
-                    number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', entry.title)
-                    doc_number = number_match.group(1) if number_match else "CẬP NHẬT MỚI"
-                    
-                    doc_type = "cong-van"
-                    if 'thông tư' in title_lower: doc_type = "thong-tu"
-                    elif 'nghị định' in title_lower: doc_type = "nghi-dinh"
-                    elif 'quyết định' in title_lower: doc_type = "quyet-dinh"
-                    elif 'nghị quyết' in title_lower: doc_type = "nghi-quyet"
-                    elif 'luật' in title_lower: doc_type = "luat"
+    # Hàm phụ trợ xác định loại văn bản
+    def get_doc_type(title_lower):
+        if 'thông tư' in title_lower: return "thong-tu"
+        if 'nghị định' in title_lower: return "nghi-dinh"
+        if 'quyết định' in title_lower: return "quyet-dinh"
+        if 'nghị quyết' in title_lower: return "nghi-quyet"
+        if 'luật' in title_lower: return "luat"
+        if 'công văn' in title_lower: return "cong-van"
+        return "cong-van"
 
-                    live_docs.append({
-                        "id": f"live-{source_name}-{len(live_docs)}",
-                        "type": doc_type,
-                        "number": doc_number,
-                        "title": entry.title,
-                        "summary": getattr(entry, 'description', 'Cập nhật tự động từ nguồn ' + source_name),
-                        "issueDate": get_vn_time().strftime('%Y-%m-%d'),
-                        "effectiveDate": "Đang cập nhật",
-                        "issuingBody": f"Nguồn: {source_name}",
-                        "status": "active",
-                        "purpose": "Cập nhật dữ liệu thời gian thực thông qua Crawler.",
-                        "keyPoints": [f"Xem nội dung chi tiết tại bản gốc: {entry.link}"],
-                        "content": f"{entry.title}\n\nĐọc toàn văn tại: {entry.link}",
-                        "articles": [],
-                        "tags": ["cập nhật tự động", "live", doc_type],
-                        "relatedDocs": []
-                    })
-        except Exception as e:
-            continue
-            
-    # Nguồn 2: Tổng cục Hải quan (Web scraping trực tiếp - Basic)
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        # Lấy trang tin tức hoặc điểm văn bản
-        r = requests.get('https://www.customs.gov.vn/index.jsp?pageId=125', headers=headers, timeout=5)
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            # Custom parsing based on customs.gov.vn structure can be added here
-            pass
-    except Exception:
-        pass
+        import sqlite3
+        conn = sqlite3.connect('data/documents.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT url, title, source_website, download_date FROM downloaded_documents ORDER BY download_date DESC LIMIT 50")
+        rows = cursor.fetchall()
+        for idx, row in enumerate(rows):
+            url, title, source, download_date = row
+            title_lower = title.lower()
+            doc_type = get_doc_type(title_lower)
+            number_match = re.search(r'([0-9]+/[0-9]+/[A-ZĐ-]+)', title)
+            doc_number = number_match.group(1) if number_match else "VĂN BẢN MỚI"
+            
+            live_docs.append({
+                "id": f"db-doc-{idx}-{int(time.time())}",
+                "type": doc_type,
+                "number": doc_number,
+                "title": title,
+                "summary": f"Văn bản tải tự động từ {source}.",
+                "issueDate": download_date[:10] if download_date else get_vn_time().strftime('%Y-%m-%d'),
+                "effectiveDate": "",
+                "issuingBody": source,
+                "status": "active",
+                "purpose": "",
+                "keyPoints": [],
+                "content": f"URL: {url}",
+                "articles": [],
+                "tags": ["Tự động tải", "Văn bản mới"],
+                "relatedDocs": []
+            })
+        conn.close()
+    except Exception as e:
+        print("Lỗi đọc DB tự động:", e)
+    
+    # Phản hồi UX: Nếu vẫn trống
+    if not live_docs:
+        live_docs.append({
+            "id": f"live-empty-{int(time.time())}",
+            "type": "cong-van",
+            "number": "THÔNG BÁO",
+            "title": f"Chưa có văn bản tự động nào được tải",
+            "summary": "Vui lòng vào Công cụ Tải Dữ Liệu Tự Động để cập nhật văn bản pháp luật.",
+            "issueDate": get_vn_time().strftime('%Y-%m-%d'),
+            "effectiveDate": "",
+            "issuingBody": "Hệ thống tự động",
+            "status": "expired",
+            "purpose": "",
+            "keyPoints": [],
+            "content": "Hệ thống chỉ tải các văn bản pháp luật chính thức, đã loại bỏ các tin tức báo chí thông thường. Vui lòng chờ đợt cập nhật sau.",
+            "articles": [],
+            "tags": ["Hệ thống"],
+            "relatedDocs": []
+        })
 
     return live_docs
 
@@ -549,7 +581,7 @@ def load_documents(domain):
             # Đưa văn bản mới lên đầu
             docs = new_live_docs + docs
     except Exception as e:
-        pass
+        print(f"Lỗi khi ghép dữ liệu live: {e}")
         
     # Sắp xếp toàn bộ văn bản theo ngày ban hành mới nhất (giảm dần)
     # Văn bản nào không có ngày ban hành thì đẩy xuống cuối
@@ -1186,6 +1218,28 @@ def render_footer(domain):
     """, unsafe_allow_html=True)
 
 
+def extract_text_from_file(uploaded_file):
+    import io
+    text = ""
+    try:
+        if uploaded_file.name.endswith(".txt"):
+            text = uploaded_file.read().decode("utf-8")
+        elif uploaded_file.name.endswith(".pdf"):
+            import PyPDF2
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.read()))
+            for page in pdf_reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        elif uploaded_file.name.endswith(".docx"):
+            import docx
+            doc = docx.Document(io.BytesIO(uploaded_file.read()))
+            for para in doc.paragraphs:
+                text += para.text + "\n"
+    except Exception as e:
+        print("Lỗi đọc file:", e)
+    return text
+
 def call_gemini_api(query, context_docs, api_key, domain):
     """Sử dụng Gemini API để trả lời câu hỏi pháp lý dựa trên ngữ cảnh."""
     
@@ -1203,9 +1257,10 @@ def call_gemini_api(query, context_docs, api_key, domain):
     else:
         role_desc = "một Kế toán trưởng kiêm Chuyên gia tư vấn Thuế am hiểu sâu sắc luật kế toán Việt Nam cập nhật đến năm 2026."
         special_instructions = """ĐẶC BIỆT LƯU Ý VỀ KẾ TOÁN VÀ THUẾ NỘI ĐỊA NĂM 2026:
-- CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi bởi Nghị định 310/2025/NĐ-CP. Thông tư 200/2014/TT-BTC ĐÃ BỊ THAY THẾ bởi Thông tư 99/2025/TT-BTC. Bắt buộc phải áp dụng các Luật, Nghị định, Thông tư năm 2025/2026 này! TUYỆT ĐỐI KHÔNG DÙNG LUẬT CŨ.
-- BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU.
-- TUYỆT ĐỐI KHÔNG DÙNG KIẾN THỨC CŨ. Mọi câu trả lời phải dựa 100% vào dữ liệu thực tế tra cứu được trên Internet. Bắt buộc ghi rõ Nguồn tra cứu.
+- CẬP NHẬT KIẾN THỨC BẮT BUỘC (2026): Luật Quản lý thuế số 38/2019/QH14 ĐÃ BỊ THAY THẾ bởi Luật Quản lý thuế số 108/2025/QH15. Nghị định 125/2020/NĐ-CP đã bị sửa đổi bởi Nghị định 310/2025/NĐ-CP. Thông tư 200/2014/TT-BTC ĐÃ BỊ THAY THẾ bởi Thông tư 99/2025/TT-BTC.
+- CẬP NHẬT THUẾ TNCN (2026): Áp dụng Luật Thuế thu nhập cá nhân 2025 và Nghị quyết 110/2025/UBTVQH15 (hiệu lực 01/01/2026). Mức giảm trừ bản thân là 15,5 triệu đồng/tháng (186 triệu/năm); Mức giảm trừ người phụ thuộc là 6,2 triệu đồng/tháng. TUYỆT ĐỐI KHÔNG DÙNG LUẬT CŨ.
+- BẠN BẮT BUỘC SỬ DỤNG CÔNG CỤ TÌM KIẾM GOOGLE (Google Search) ĐỂ LẤY DỮ LIỆU TỪ INTERNET TOÀN CẦU. Nếu Internet không tìm thấy luật 2026, hãy tự động ưu tiên áp dụng các Cập nhật kiến thức bắt buộc ở trên.
+- Mọi câu trả lời phải dựa 100% vào dữ liệu thực tế và các luật năm 2026. Bắt buộc ghi rõ Nguồn tra cứu.
 - BẮT BUỘC TRÌNH BÀY định khoản kế toán, công thức tính thuế, mức phạt theo dạng danh sách gạch đầu dòng (Bullet points). TUYỆT ĐỐI KHÔNG SỬ DỤNG BẢNG (TABLE) VÌ SẼ BỊ LỖI HIỂN THỊ."""
 
     from datetime import datetime
@@ -1226,6 +1281,16 @@ CÂU HỎI CỦA NGƯỜI DÙNG:
 
 TRẢ LỜI CỦA LUẬT SƯ:"""
 
+    user_uploaded_text = ""
+    if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
+        for f in st.session_state.uploaded_files:
+            f.seek(0)
+            text = extract_text_from_file(f)
+            user_uploaded_text += f"\n--- TÀI LIỆU NỘI BỘ MẬT: {f.name} ---\n{text}\n"
+
+    if user_uploaded_text:
+        prompt += f"\n\n--- DỮ LIỆU NỘI BỘ DOANH NGHIỆP CUNG CẤP (ƯU TIÊN TRẢ LỜI DỰA VÀO ĐÂY NẾU CÂU HỎI LIÊN QUAN) ---\n{user_uploaded_text}\n"
+
     api_keys = [k.strip() for k in api_key.split(',')] if ',' in api_key else [api_key.strip()]
     stats = get_system_stats()
     from datetime import datetime
@@ -1234,28 +1299,56 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
         stats["api_calls"] = 0
         
     last_error = ""
-    # Giai đoạn 1: Trùm cuối Deep Research (CÓ Search)
+    
+    # Giai đoạn 0: TỰ ĐỘNG CÀO WEB (DuckDuckGo + Gemini 2.5 Flash) - CỨU CÁNH CHO API FREE
     for current_key in api_keys:
         if not current_key: continue
         try:
+            search_context, sources = search_duckduckgo(query)
+            
+            if not sources:
+                raise Exception("DuckDuckGo không có kết quả")
+                
+            ddg_prompt = prompt + f"\n\n--- DỮ LIỆU THỰC TẾ TỪ INTERNET (BẮT BUỘC SỬ DỤNG) ---\n{search_context}\n"
+            
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('deep-research-max-preview-04-2026', tools='google_search_retrieval')
-            response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Deep Research Max + Search)*"
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            response = model.generate_content(ddg_prompt)
+            
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 0 (DuckDuckGo Search + Gemini 2.5 Flash)*"
+            if sources:
+                text += "\n\n**🔍 Nguồn tham khảo từ Web:**"
+                for src in sources:
+                    text += f"\n- [{src['title']}]({src['url']})"
+                    
             stats["api_calls"] += 1
             return text
         except Exception as e:
             last_error = str(e)
             continue
 
-    # Giai đoạn 2: Trùm cuối 3.1 Pro (CÓ Search)
+    # Giai đoạn 1: Trùm cuối Deep Research (CÓ Search)
     for current_key in api_keys:
         if not current_key: continue
         try:
             genai.configure(api_key=current_key)
-            model = genai.GenerativeModel('gemini-3.1-pro-preview', tools='google_search_retrieval')
+            model = genai.GenerativeModel('gemini-2.5-flash', tools='google_search_retrieval')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 3.1 Pro + Search)*"
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 1 (Gemini 2.5 Flash + Google Search)*"
+            stats["api_calls"] += 1
+            return text
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    # Giai đoạn 2: Trùm cuối 1.5 Pro (CÓ Search - Hỗ trợ API chuẩn)
+    for current_key in api_keys:
+        if not current_key: continue
+        try:
+            genai.configure(api_key=current_key)
+            model = genai.GenerativeModel('gemini-2.5-pro', tools='google_search_retrieval')
+            response = model.generate_content(prompt)
+            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 2 (Gemini 1.5 Pro + Google Search)*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
@@ -1325,7 +1418,7 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             genai.configure(api_key=current_key)
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
-            text = response.text + "\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline Thông Minh Tốc Độ)*"
+            text = response.text + f"\n\n---\n*💡 Đã trả lời bởi: Tầng 7 (Gemini 2.5 Flash - Bản Offline). (Lý do rớt tầng: {last_error})*"
             stats["api_calls"] += 1
             return text
         except Exception as e:
@@ -1346,16 +1439,17 @@ TRẢ LỜI CỦA LUẬT SƯ:"""
             last_error = str(e)
             continue
             
+    available_models = "Không lấy được"
+    try:
+        genai.configure(api_key=api_keys[0])
+        available_models = ", ".join([m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods])
+    except Exception as ext:
+        available_models = f"Lỗi lấy danh sách model: {ext}"
+
     if "quota" in last_error.lower() or "429" in last_error:
-        available_models = "Không lấy được"
-        try:
-            genai.configure(api_key=api_keys[0])
-            available_models = ", ".join([m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods])
-        except:
-            pass
         return f"⚠️ **Hệ thống đã thử toàn bộ API Keys nhưng đều đã Quá tải hoặc Hết lượt AI miễn phí!**\n\n*(Lưu ý: Bạn có thể nhập nhiều API Key cùng lúc, cách nhau bằng dấu phẩy `,`)*\n\nGoogle giới hạn tài khoản miễn phí ở 2 mức:\n1. **Giới hạn tốc độ (15 câu / phút):** Bạn đang hỏi quá nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.\n2. **Giới hạn ngày (1500 câu / ngày):** Vui lòng [vào đây](https://aistudio.google.com/app/apikey) bằng tài khoản Gmail khác để lấy Key mới và dán nối tiếp vào phần cài đặt theo dạng `KEY1, KEY2, KEY3`.\n\n**🤖 CÁC MODEL KHẢ DỤNG CHO API NÀY:**\n`{available_models}`\n\n**🔍 CHI TIẾT LỖI GỐC CỦA GOOGLE:**\n`{last_error}`"
     else:
-        return f"Lỗi khi kết nối với AI Trợ lý: {last_error}. Vui lòng kiểm tra lại cấu hình API Key."
+        return f"Lỗi khi kết nối với AI Trợ lý: {last_error}.\n\n💡 **DANH SÁCH MODEL BẠN ĐƯỢC PHÉP DÙNG:**\n`{available_models}`\n\n(Hãy gửi danh sách này cho AI để AI cấu hình lại code nhé!)"
 
 
 def classify_solder_product(product_type, silver_pct, flux_pct, solvent_pct=0):
@@ -1615,6 +1709,14 @@ def render_hs_tool(api_key):
 # MAIN APP
 # ============================================
 def main():
+    if st.session_state.get('show_scraper', False):
+        from scraper_ui import render_scraper_ui
+        if st.sidebar.button("⬅️ Quay lại trang chủ", use_container_width=True):
+            st.session_state.show_scraper = False
+            st.rerun()
+        render_scraper_ui()
+        return
+
     if "domain" not in st.session_state:
         st.session_state.domain = "Hải quan & Xuất nhập khẩu"
         
@@ -1664,11 +1766,23 @@ def main():
                 
         st.markdown("---")
         st.markdown("### 🔄 Dữ liệu trực tuyến")
+        if st.button("⬇️ Mở Công Cụ Tải Dữ Liệu Tự Động", use_container_width=True):
+            st.session_state.show_scraper = True
+            st.rerun()
         if st.button("Làm mới dữ liệu ngay", use_container_width=True, type="secondary"):
             fetch_live_data.clear()
             load_documents.clear()
             st.success("Đã xóa cache và tải dữ liệu mới nhất!")
             st.rerun()
+            
+        st.markdown("---")
+        st.markdown("### 📤 Tải tài liệu nội bộ")
+        st.markdown("<p style='font-size:0.8rem;color:#94a3b8;'>Đẩy công văn, hồ sơ nội bộ cho AI đọc (Hỗ trợ PDF, Word, TXT).</p>", unsafe_allow_html=True)
+        uploaded_files = st.file_uploader("Tải lên bản PDF, Word, TXT", accept_multiple_files=True, type=['pdf', 'txt', 'docx'], label_visibility="collapsed")
+        if uploaded_files:
+            st.session_state.uploaded_files = uploaded_files
+        else:
+            st.session_state.uploaded_files = []
             
         st.markdown("---")
         st.markdown("### 📊 Thống kê hệ thống")
