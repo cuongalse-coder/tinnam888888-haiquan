@@ -1753,9 +1753,13 @@ def main():
 
         st.markdown("---")
         st.markdown("### 🤖 Cài đặt AI Luật Sư")
+        api_key = api_key_secret
         if api_key_secret:
             st.success("Đã kích hoạt AI Luật Sư (Cấu hình tự động)!")
-            api_key = api_key_secret
+            manual_key = st.text_input("🔑 Nhập Key mới để ghi đè (nếu Key tự động lỗi)", type="password", placeholder="Dán Gemini API Key mới tại đây...")
+            if manual_key.strip():
+                api_key = manual_key.strip()
+                st.info("Đã ghi đè bằng API Key thủ công.")
         else:
             st.markdown("Để AI có thể tự động đọc luật và trả lời chính xác, hãy nhập Google Gemini API Key vào đây. Hỗ trợ nhập nhiều Key cùng lúc để tránh hết lượt (cách nhau bởi dấu phẩy `,`). [Lấy key miễn phí tại đây](https://aistudio.google.com/app/apikey).")
             api_key = st.text_input("Gemini API Key (Hỗ trợ nhiều Key)", type="password")
